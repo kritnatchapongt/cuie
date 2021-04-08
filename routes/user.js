@@ -44,7 +44,7 @@ async function login(req,res) {
             const ck = uuidv4();
             res.cookie('session_id', ck);
             try {
-                await db.promise().query(`INSERT INTO cookie VALUE('${userID}','${ck}') `);
+                await db.promise().query(`UPDATE cookie SET cookieID = '${ck}' WHERE userID = ${userID}`);
                 res.status(200).send({msg: 'login success'});
             } catch (err) {
                 if (err.code == 'ER_DUP_ENTRY' || err.errno == 1062) {

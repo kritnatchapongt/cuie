@@ -6,6 +6,7 @@ const router = Router();
 const { v4: uuidv4 } = require('uuid');
 var multer = require('multer');
 var path = require('path');
+const { msghis,invitechat,roomList } = require('./chat');
 
 
 //signup
@@ -47,4 +48,6 @@ const fileFilter = (req, file, cb) => {
 const upload = multer({ storage: storage, fileFilter: fileFilter });
 router.post('/upload', upload.array('image', 100),validateCookie, uploadboardcast);
 router.get('/getboardcastt', validateCookie, getboardcast);
+router.get('/getchathistory', validateCookie, msghis);
+router.post("/invitemember",invitechat);
 module.exports = router;
