@@ -10,7 +10,7 @@ switch (process.env.ENV) {
         }
         break;
     case "GCLOUD":
-        onn = {
+        conn = {
             socketPath: process.env.DB_GCLOUD_URL ,
             user: process.env.DB_GCLOUD_USER ,
             password: process.env.DB_GCLOUD_PASSWORD ,
