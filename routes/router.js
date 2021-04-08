@@ -1,6 +1,6 @@
 const {Router, static} = require('express');
 const {signup,login,logout,contact,contactinfo,validateCookie} = require('./user')
-const {uploadboardcast,getboardcast} =require('./boardcast')
+const {uploadpost: uploadpost,getpost: getpost} =require('./post')
 const db = require('../database');
 const router = Router();
 const { v4: uuidv4 } = require('uuid');
@@ -46,8 +46,8 @@ const fileFilter = (req, file, cb) => {
     }
 }
 const upload = multer({ storage: storage, fileFilter: fileFilter });
-router.post('/upload', upload.array('image', 100),validateCookie, uploadboardcast);
-router.get('/getboardcastt', validateCookie, getboardcast);
+router.post('/upload', upload.array('image', 100),validateCookie, uploadpost);
+router.get('/getboardcastt', validateCookie, getpost);
 router.get('/getchathistory', validateCookie, msghis);
 router.post("/invitemember",invitechat);
 module.exports = router;

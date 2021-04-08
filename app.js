@@ -1,3 +1,4 @@
+require('dotenv').config();
 const express = require('express');
 const cookieParser = require('cookie-parser');
 const usersRoute = require('./routes/router');
@@ -5,7 +6,6 @@ const app = express();
 const db = require('./database');
 const { v4: uuidv4 } = require('uuid');
 const {datesql} = require('./util');
-require('dotenv').config();
 
 app.use(cookieParser());
 app.use(express.urlencoded({ extended: true }));
