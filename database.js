@@ -1,8 +1,22 @@
 const mysql =require('mysql2');
 
-module.exports = mysql.createConnection({
-    host: process.env.DB_URL ,
-    user: process.env.DB_USER ,
-    password: process.env.DB_PASSWORD ,
-    database: process.env.DB_DATABASE
-});
+switch (process.env.ENV) {
+    case "LOCAL":
+        conn = {
+            host: process.env.DB_LOCAL_URL ,
+            user: process.env.DB_LOCAL_USER ,
+            password: process.env.DB_LOCAL_PASSWORD ,
+            database: process.env.DB_LOCAL_DATABASE
+        }
+        break;
+    case "GCLOUD":
+        onn = {
+            socketPath: process.env.DB_GCLOUD_URL ,
+            user: process.env.DB_GCLOUD_USER ,
+            password: process.env.DB_GCLOUD_PASSWORD ,
+            database: process.env.DB_GCLOUD_DATABASE
+        }
+        break;
+}
+
+module.exports = mysql.createConnection(conn);
