@@ -23,45 +23,47 @@ async function signup(req, res) {
         const ck = uuidv4();
         res.cookie('session_id', ck);
         try {
-        await db.promise().query(`INSERT INTO user VALUE('${name}','${surname}','${status}','${userID}','${password}','${email}')`);
-        await db.promise().query(`INSERT INTO cookie VALUE('${userID}','${ck}') `);
-        res.status(201).send({msg: 'Created User'});
+            await db.promise().query(`INSERT INTO user (name, surname, status, userID, password, email) VALUES('${name}','${surname}','${status}','${userID}','${password}','${email}')`);
+            await db.promise().query(`INSERT INTO cookie (userID, cookieID) VALUES('${userID}','${ck}') `);
+            res.status(201).send({msg: 'Created User'});
         } catch (err) {
             if (err.code == 'ER_DUP_ENTRY' || err.errno == 1062) {
-                res.status(400).send({msg: 'userID already use'})
+                res.status(401).send({msg: 'userID already use'})
             } else {
+                console.log(err)
                 res.status(500).send({msg: "Internal Error"})
             }
         }
-    } else res.status(403).send({msg: 'EROR'});
+    } else res.status(400).send({msg: 'Bad Request'});
 };
 //signin
 async function login(req,res) {
     const {userID,password} = req.body;
     if(userID&&password) {
-        const checklogin = await db.promise().query(`SELECT user.password FROM USER WHERE user.userID = ${userID}`);
+        const checklogin = await db.promise().query(`SELECT user.password FROM USER WHERE user.userID = '${userID}'`);
         if (checklogin[0].length >= 1 && checklogin[0][0].password === password){
             const ck = uuidv4();
             res.cookie('session_id', ck);
             try {
-                await db.promise().query(`UPDATE cookie SET cookieID = '${ck}' WHERE userID = ${userID}`);
+                await db.promise().query(`UPDATE cookie SET cookieID = '${ck}' WHERE userID = '${userID}'`);
                 res.status(200).send({msg: 'login success'});
             } catch (err) {
                 if (err.code == 'ER_DUP_ENTRY' || err.errno == 1062) {
-                    res.status(400).send({msg: 'There is another login'})
+                    // Deprecated
+                    res.status(401).send({msg: 'There is another login'})
                 } else {
                     res.status(500).send({msg: "Internal Error"})
                 }
             }
         } else res.status(403).send({msg: 'invalid userID or password'});
-    } else res.status(403).send({msg: 'invalid userID or password'});
+    } else res.status(400).send({msg: 'Bad Request'});
 
 }
 //logout 
 async function logout(req,res) {
-    await db.promise().query(`DELETE FROM cookie WHERE cookieID = '${req.cookies.session_id}'`);
+    await db.promise().query(`UPDATE cookie SET cookieID = NULL WHERE cookieID = '${req.cookies.session_id}'`);
     try {
-        res.clearCookie(session_id);
+        res.clearCookie(req.cookies.session_id);
     } finally {
         res.status(200).send({msg:'log out'});
     }

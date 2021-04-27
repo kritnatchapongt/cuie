@@ -21,21 +21,24 @@ router.get('/contacts', contact);
 router.get('/contacts/info', contactinfo);
 
 
-router.use('/static', static('./picCUIE'));
+router.use('/static', static(process.env.PATH_STATIC));
 
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
-        cb(null, 'picCUIE');
+        cb(null, path.join(process.env.PATH_STATIC, 'upload'))
     },
     filename: (req, file, cb) => {
+        filename = Date.now() + path.extname(file.originalname)
+        fullpath = path.join(process.env.PATH_STATIC, 'upload', filename)
+        console.log(fullpath)
         if (!req.context) {
             req.context = {
-                picroute: Date.now() + path.extname(file.originalname)
+                picroute: filename
             }
         } else {
-            req.context.picroute = Date.now() + path.extname(file.originalname)
+            req.context.picroute = filename
         }
-        cb(null, Date.now() + path.extname(file.originalname));
+        cb(null, filename);
     }
 });
 const fileFilter = (req, file, cb) => {
@@ -47,7 +50,7 @@ const fileFilter = (req, file, cb) => {
 }
 const upload = multer({ storage: storage, fileFilter: fileFilter });
 router.post('/upload', upload.array('image', 100),validateCookie, uploadpost);
-router.get('/getboardcastt', validateCookie, getpost);
+router.get('/getboardcast', validateCookie, getpost);
 router.get('/getchathistory', validateCookie, msghis);
 router.post("/invitemember",invitechat);
 module.exports = router;

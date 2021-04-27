@@ -1,8 +1,8 @@
 const mysql =require('mysql2');
 
 module.exports = mysql.createConnection({
-    host: process.env.DB_URL ,
-    user: process.env.DB_USER ,
-    password: process.env.DB_PASSWORD ,
+    host: 'db',
+    user: process.env.DB_USERNAME,
+    password: process.env.DB_PASSWORD,
     database: process.env.DB_DATABASE
 });
