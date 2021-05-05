@@ -1,37 +1,8 @@
 const {Router, static} = require('express');
-const {signup, login, logout, contact, contactinfo, validateCookie} = require('./user');
-const {uploadpost: uploadpost, getpost: getpost} =require('./post');
-const multer = require('multer');
-const path = require('path');
-const { msghis, invitechat, roomList } = require('./chat');
-
-// Upload files File Server
-const storage = multer.diskStorage({
-    destination: (req, file, cb) => {
-        cb(null, path.join(process.env.PATH_STATIC, 'upload'));
-    },
-    filename: (req, file, cb) => {
-        const filename = Date.now() + path.extname(file.originalname);
-        const fullpath = path.join(process.env.PATH_STATIC, 'upload', filename);
-        console.log(fullpath);
-        if (!req.context) {
-            req.context = {
-                picroute: filename
-            };
-        } else {
-            req.context.picroute = filename;
-        }
-        cb(null, filename);
-    }
-});
-const fileFilter = (req, file, cb) => {
-    if (file.mimetype == 'image/jpeg' || file.mimetype == 'image/png'||file.mimetype == 'application/pdf') {
-        cb(null, true);
-    } else {
-        cb(null, false);
-    }
-};
-const upload = multer({ storage: storage, fileFilter: fileFilter });
+const {signup, login, logout, validateCookie} = require('./authen');
+const {getContacts, getContactInfo, editProfile} = require('./profile');
+const {postFeedUploadMulter, postFeed, getFeeds} = require('./post');
+const {getRooms, getRoomInfo, invitechat} = require('./chat');
 
 const router = Router();
 {
@@ -44,17 +15,15 @@ const router = Router();
 
     const userRouter = Router();
     {
-        // File Serving
-        userRouter.post('/upload', upload.array('image', 100), validateCookie, uploadpost);
         // Contact/Profile
-        userRouter.get('/contacts', contact);
-        userRouter.get('/contact', contactinfo);
-        // userRouter.put('/profile', editProfile);
+        userRouter.get('/contacts', getContacts);
+        userRouter.get('/contact', getContactInfo);
+        userRouter.put('/profile', editProfile);
         // userRouter.put('/profile/pic', editProfilePic);
-        // userRouter.post('/feed', uploadPost);
-        userRouter.get('/feeds', getpost);
-        // userRouter.get('/rooms', getChatrooms);
-        userRouter.get('/room', msghis);
+        userRouter.post('/feed', postFeedUploadMulter.array('files', 100), postFeed);
+        userRouter.get('/feeds', getFeeds);
+        userRouter.get('/rooms', getRooms);
+        userRouter.get('/room', getRoomInfo);
         userRouter.post("/room/invite", invitechat);
     }
     router.use('/user', validateCookie, userRouter);

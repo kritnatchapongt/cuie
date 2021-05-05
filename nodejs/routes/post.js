@@ -1,32 +1,89 @@
-const db = require('../database');
+const db = require('../util/database');
 const { v4: uuidv4 } = require('uuid');
+const multer = require('multer');
+const path = require('path');
 
-//uploadpost
-async function uploadpost(req, res){
-    const {head,body,targets}=JSON.parse(req.body.info);
+// File upload for POST feed multipart
+const storage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        cb(null, path.join(process.env.PATH_STATIC, 'files'));
+    },
+    filename: (req, file, cb) => {
+        const fileName = Date.now().toString() + req.data.userID + path.extname(file.originalname);
+        const relPath = path.join('files', fileName);
+        const absPath = path.join(process.env.PATH_STATIC, relPath);
+        const urlPath = path.join('static', relPath);
+        const uploadData = {
+            fileName: fileName,
+            fileType: file.mimetype,
+            relPath: relPath,
+            absPath: absPath,
+            urlPath: urlPath
+        };
+        if (!req.context) {
+            req.context = {
+                upload: uploadData
+            };
+        } else {
+            req.context.upload = uploadData;
+        }
+        cb(null, fileName);
+    }
+});
+const fileFilter = (req, file, cb) => {
+    if (file.mimetype == 'image/jpeg' || file.mimetype == 'image/png' || file.mimetype == 'application/pdf') {
+        cb(null, true);
+    } else {
+        cb(null, false);
+    }
+};
+const postFeedUploadMulter = multer({ storage, fileFilter });
+
+async function postFeed(req, res){
+    const {head, body, targets} = JSON.parse(req.body.info);
+    if (!(head && body && targets && Array.isArray(targets))) {
+        res.status(400).send({msg: "Bad Request"});
+    }
+    if (!req.context.upload) {
+        res.status(400).send({msg: "File upload failed"});
+    }
+
+    const filePath = req.context.upload.relPath;
+    const senderID = req.data.userID;
+    const postid = uuidv4();
+    await db.promise().query(`
+        INSERT INTO post
+        (postID, head, body, senderID, filepath)
+        VALUE('${postid}', '${head}', '${body}', '${senderID}', '${filePath}')
+    `);
+
     const targetStr = targets.toString();
     const targetsplit = targetStr.split(",");
-    const postid = uuidv4();
     for(var i = 0; i < targetsplit.length; i++) {
-        db.promise().query(`INSERT INTO posttarget VALUE('${postid}','${targetsplit[i]}')`);
+        db.promise().query(`
+            INSERT INTO posttarget
+            (postID, target)
+            VALUE('${postid}', '${targetsplit[i]}')
+        `);
     }
-    const picroute = req.context.picroute;
-    const sender = (await db.promise().query(`SELECT userID FROM cookie WHERE cookieID = '${req.cookies.session_id}'`))[0][0].userID;
-    await db.promise().query(`INSERT INTO post VALUE('${postid}','${head}','${body}','${sender}','${picroute}')`);
-    try {
-        return res.status(201).json({
-            message: 'File uploaded successfully'
-        });
-    } catch (error) {
-        res.status(400).send({msg: "File uploaded fail"});
-    }
-}
-//getpost
-async function getpost(req,res){
-    const gotpost = await db.promise().query(`SELECT post.postID,head,senderID,picroute,target FROM post RIGHT JOIN posttarget 
-    ON boardcast.boardcastID = bctarget.boardcastID INNER JOIN cookie ON bctarget.target = cookie.userID
-    WHERE cookie.cookieID = '${req.cookies.session_id}'`);
-    res.status(200).send(gotpost);
+    
+    res.status(200).send({msg: 'File uploaded successfully'});
 }
 
-module.exports = {uploadpost: uploadpost,getpost: getpost};
+async function getFeeds(req, res){
+    const query = await db.promise().query(`
+        SELECT p.postID, p.head, p.body, p.senderID, p.posttime, p.filepath
+            FROM post as p
+            INNER JOIN posttarget as pt
+                ON p.postID = pt.postID
+            WHERE pt.target = '${req.data.userID}'
+        UNION
+        SELECT p.postID, p.head, p.body, p.senderID, p.posttime, p.filepath
+            FROM post as p
+            WHERE p.senderID = '${req.data.userID}'
+        ORDER BY posttime ASC;
+    `);
+    res.status(200).send(query[0]);
+}
+
+module.exports = {postFeedUploadMulter, postFeed, getFeeds};
