@@ -35,7 +35,7 @@ async function getContactInfo(req, res) {
         WHERE user.userID = '${userID}'
     `);
     if (query[0].length < 1) {
-        res.status(401).send({msg: 'Invalid userID'});
+        res.status(400).send({msg: 'Invalid userID'});
     }
 
     res.status(200).send(query[0][0]);

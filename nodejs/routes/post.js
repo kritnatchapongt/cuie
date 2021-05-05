@@ -45,7 +45,7 @@ async function postFeed(req, res){
         res.status(400).send({msg: "Bad Request"});
     }
     if (!req.context.upload) {
-        res.status(400).send({msg: "File upload failed"});
+        res.status(500).send({msg: "File upload failed"});
     }
 
     const filePath = req.context.upload.relPath;

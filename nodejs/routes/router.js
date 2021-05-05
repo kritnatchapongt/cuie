@@ -2,7 +2,7 @@ const {Router, static} = require('express');
 const {signup, login, logout, validateCookie} = require('./authen');
 const {getContacts, getContactInfo, editProfile} = require('./profile');
 const {postFeedUploadMulter, postFeed, getFeeds} = require('./post');
-const {getRooms, getRoomInfo, invitechat} = require('./chat');
+const {validateRoom, createRoom, getRooms, getRoomInfo, inviteChat} = require('./chat');
 
 const router = Router();
 {
@@ -22,9 +22,15 @@ const router = Router();
         // userRouter.put('/profile/pic', editProfilePic);
         userRouter.post('/feed', postFeedUploadMulter.array('files', 100), postFeed);
         userRouter.get('/feeds', getFeeds);
+        userRouter.post('/room', createRoom);
         userRouter.get('/rooms', getRooms);
-        userRouter.get('/room', getRoomInfo);
-        userRouter.post("/room/invite", invitechat);
+
+        const roomRouter = Router();
+        {
+            roomRouter.get('/info', getRoomInfo);
+            roomRouter.post('/invite', inviteChat);
+        }
+        userRouter.use('/room', validateRoom, roomRouter);
     }
     router.use('/user', validateCookie, userRouter);
 }

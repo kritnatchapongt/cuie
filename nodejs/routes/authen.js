@@ -16,10 +16,11 @@ async function validateCookie(req, res, next){
             };
             next();
         } else {
-            res.status(403).send({msg:'Not Authenticated'});
+            res.status(401).send({msg:'Not Authenticated'});
         }
+    } else {
+        res.status(401).send({msg:'Not Authenticated'});
     }
-    else { res.status(403).send({msg:'Not Authenticated'});}
 }
 
 async function signup(req, res) {
@@ -44,7 +45,7 @@ async function signup(req, res) {
         res.status(200).send({msg: 'Created User'});
     } catch (err) {
         if (err.code == 'ER_DUP_ENTRY' || err.errno == 1062) {
-            res.status(401).send({msg: 'userID already use'});
+            res.status(403).send({msg: 'userID already use'});
         } else {
             console.log(err);
             res.status(500).send({msg: "Internal Error"});
@@ -64,7 +65,7 @@ async function login(req, res) {
         WHERE user.userID = '${userID}'
     `);
     if (checklogin[0].length < 1 || checklogin[0][0].password !== password) {
-        res.status(403).send({msg: 'invalid userID or password'});
+        res.status(401).send({msg: 'invalid userID or password'});
     }
 
     const ck = uuidv4();
@@ -79,7 +80,7 @@ async function login(req, res) {
     } catch (err) {
         if (err.code == 'ER_DUP_ENTRY' || err.errno == 1062) {
             // Deprecated
-            res.status(401).send({msg: 'There is another login'});
+            res.status(403).send({msg: 'There is another login'});
         } else {
             console.log(err);
             res.status(500).send({msg: "Internal Error"});
