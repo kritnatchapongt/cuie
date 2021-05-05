@@ -1,0 +1,45 @@
+<html>
+
+<head>
+  <title>Express</title>
+  <link rel="stylesheet" href="./stylesheets/style.css">
+  <script src="./socket.io/socket.io.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    
+
+    <script>
+
+      //-------------------------------------------------------------------------//
+      // TODO : to test socket join 
+      //-------------------------------------------------------------------------//
+      
+
+        const full = location.protocol+'//'+location.hostname+(location.port ? ':'+location.port: '');
+        const socket = io(full);
+        socket.on('connect', (data)=>{
+            console.log('Client connected !  from client')
+            // socket.emit('join' , krathongId)
+
+            // socket.on('update' , (data)=>{
+            //     console.log("Got update from server  data : ", data );
+            // })
+        })
+
+    </script>
+
+
+
+</head>
+
+<body>
+  <h1>Test Socket.io</h1>
+  <p>to test socket.io join</p>
+  <p id="userCount"></p>
+  <a>Krathong Id </a> <input type="text " id="krathongId" ><button onclick="update()">Join</button> <br/>
+  <a>Krathong Id </a> <input type="text " id="krathongId" ><button onclick="update()">Join</button> <br/>
+  <a>Krathong Id </a> <input type="text " id="krathongId" ><button onclick="update()">Join</button> <br/>
+  <a>Krathong Id </a> <input type="text " id="krathongId" ><button onclick="update()">Join</button> <br/>
+  <script src="./javascripts/script.js"></script>
+</body>
+
+</html>

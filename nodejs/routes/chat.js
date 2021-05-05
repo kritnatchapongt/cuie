@@ -116,7 +116,7 @@ async function createRoomGroup(req, res) {
 
 async function getRooms(req, res) {
     const query = await db.promise().query(`
-        SELECT r.roomID, r.name, r.roomtype, r.lastmsg as lastMsg,
+        SELECT r.roomID, r.name, r.roomtype as roomType, r.lastmsg as lastMsg,
             m.sendtime as lastMsgTime, m.message as lastMsgContext, m.message_type as lastMsgType
         FROM room as r
         INNER JOIN roomuser as ru
@@ -124,20 +124,38 @@ async function getRooms(req, res) {
         LEFT JOIN message as m
             ON r.lastmsg = m.messageID
         WHERE ru.userID = '${req.data.userID}'
-        ORDER BY r.lastmsg_time ASC
+        ORDER BY r.lastmsg_time DESC
     `);
     
     for (var i = 0; i < query[0].length; i++) {
         const obj = query[0][i];
-        const queryMembers = await db.promise().query(`
-            SELECT ru.userID
-            FROM roomuser AS ru
-            LEFT JOIN user AS u
-                ON ru.userID = u.userID
-            WHERE ru.roomID = '${obj.roomID}'
-            ORDER BY u.name ASC;
-        `);
-        obj.members = queryMembers[0].map(row => row.userID);
+        if (obj.roomType === 'SINGLE') {
+            const queryOtherMem = await db.promise().query(`
+                SELECT ru.userID, u.name, u.surname
+                FROM roomuser AS ru
+                LEFT JOIN user AS u
+                    ON ru.userID = u.userID
+                WHERE ru.roomID = '${obj.roomID}' AND ru.userID != '${req.data.userID}'
+            `);
+            if (queryOtherMem[0].length !== 1) {
+                obj.members = [req.data.userID];
+            } else {
+                obj.members = [queryOtherMem[0][0].userID, req.data.userID];
+                obj.name = queryOtherMem[0][0].name;
+            }
+        } else if (obj.roomType === 'GROUP') {
+            const queryMembers = await db.promise().query(`
+                SELECT ru.userID
+                FROM roomuser AS ru
+                LEFT JOIN user AS u
+                    ON ru.userID = u.userID
+                WHERE ru.roomID = '${obj.roomID}'
+                ORDER BY u.name ASC;
+            `);
+            obj.members = queryMembers[0].map(row => row.userID);
+        } else {
+            obj.members = [];
+        }
     }
     res.status(200).send(query[0]);
 }
@@ -150,7 +168,7 @@ async function getRoomInfo(req, res) {
         LEFT JOIN user AS u
             ON m.senderID = u.userID
         WHERE m.roomID = '${req.context.room.roomID}'
-        ORDER BY m.sendtime ASC;
+        ORDER BY m.sendtime DESC;
     `);
     const queryMembers = await db.promise().query(`
         SELECT ru.userID, u.name, u.surname, u.status

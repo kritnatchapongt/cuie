@@ -4,6 +4,8 @@ const {datesql} = require('../util/functions');
 
 function createSocketMapper(io) {
     return function (socket) {
+        console.log('Connected' + socket.id);
+
         socket.on('test:to_server', async function (obj) {
             console.log(obj);
             io.emit('test:from_server', obj);

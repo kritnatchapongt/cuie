@@ -81,7 +81,7 @@ async function getFeeds(req, res){
         SELECT p.postID, p.head, p.body, p.senderID, p.posttime, p.filepath
             FROM post as p
             WHERE p.senderID = '${req.data.userID}'
-        ORDER BY posttime ASC;
+        ORDER BY posttime DESC;
     `);
     res.status(200).send(query[0]);
 }
