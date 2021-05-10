@@ -36,7 +36,7 @@ CREATE TABLE `cookie` (
 
 LOCK TABLES `cookie` WRITE;
 /*!40000 ALTER TABLE `cookie` DISABLE KEYS */;
-INSERT INTO `cookie` VALUES ('12345','c0175c60-1e32-499d-8954-0a2919c8f56e',NULL),('6030024721','9ea661aa-384c-498b-a08d-fcc00a51eb6b',NULL),('6231341521','b5a5aede-67da-485e-8a09-5f1211a8b8f1',NULL),('9876543','130583a7-a019-455b-bcf7-b3f6a5609777',NULL);
+INSERT INTO `cookie` VALUES ('12345','c0175c60-1e32-499d-8954-0a2919c8f56e',NULL),('6030024721','9ea661aa-384c-498b-a08d-fcc00a51eb6b',NULL),('6231341521','501730c9-7ced-48a8-983f-5e431eaab515',NULL),('9876543','130583a7-a019-455b-bcf7-b3f6a5609777',NULL);
 /*!40000 ALTER TABLE `cookie` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -133,6 +133,8 @@ CREATE TABLE `room` (
   `roomtype` varchar(20) DEFAULT NULL,
   `lastmsg` varchar(1000) DEFAULT NULL,
   `lastmsg_time` timestamp NULL DEFAULT NULL,
+  `single_userID1` varchar(45) DEFAULT NULL,
+  `single_userID2` varchar(45) DEFAULT NULL,
   PRIMARY KEY (`roomID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -143,7 +145,7 @@ CREATE TABLE `room` (
 
 LOCK TABLES `room` WRITE;
 /*!40000 ALTER TABLE `room` DISABLE KEYS */;
-INSERT INTO `room` VALUES ('736d07fa-9330-4b73-968e-fc085f79e645','รวมพลกีกี้','GROUP','81e73fab-f39e-4975-bc64-ae92c944b809','2021-05-05 17:27:03'),('852e5d94-7738-4bbb-9550-e719b348dd9b',NULL,'SINGLE','f7d79aff-ad39-4afe-a1f9-346e5df8cea8','2021-05-05 17:26:09'),('b4267180-a4b0-4556-8d29-ebeaff1c9e29',NULL,'SINGLE','77b9de60-bf95-4a3f-96b2-374323fd3f1f','2021-05-05 17:24:26'),('c2519f55-effc-4016-a9a7-22718e172e9b',NULL,'SINGLE',NULL,NULL),('cc97e4f4-12e2-4f0c-9a6d-0a0b28699b47','กลุ่มลับมหัศจรรย์','GROUP','b91adc10-e292-4c82-a69f-44bc2ce7ff7a','2021-05-05 17:21:08'),('chatroom01','chatroom01','GROUP','message01','2021-05-05 08:32:48');
+INSERT INTO `room` VALUES ('736d07fa-9330-4b73-968e-fc085f79e645','รวมพลกีกี้','GROUP','81e73fab-f39e-4975-bc64-ae92c944b809','2021-05-05 17:27:03',NULL,NULL),('852e5d94-7738-4bbb-9550-e719b348dd9b',NULL,'SINGLE','f7d79aff-ad39-4afe-a1f9-346e5df8cea8','2021-05-05 17:26:09','12345','6231341521'),('b4267180-a4b0-4556-8d29-ebeaff1c9e29',NULL,'SINGLE','77b9de60-bf95-4a3f-96b2-374323fd3f1f','2021-05-05 17:24:26','6030024721','6231341521'),('c2519f55-effc-4016-a9a7-22718e172e9b',NULL,'SINGLE',NULL,NULL,'6231341521','9876543'),('cc97e4f4-12e2-4f0c-9a6d-0a0b28699b47','กลุ่มลับมหัศจรรย์','GROUP','b91adc10-e292-4c82-a69f-44bc2ce7ff7a','2021-05-05 17:21:08',NULL,NULL),('chatroom01','chatroom01','GROUP','message01','2021-05-05 08:32:48',NULL,NULL);
 /*!40000 ALTER TABLE `room` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -198,7 +200,7 @@ CREATE TABLE `user` (
 
 LOCK TABLES `user` WRITE;
 /*!40000 ALTER TABLE `user` DISABLE KEYS */;
-INSERT INTO `user` VALUES ('Thanainun','Li','professor','12345','li','email@li.com',NULL,NULL,NULL),('pun','mr','student4','6030024721','159951123','kritnatchapong@hotmail.com','ie','เทส',NULL),('pon-ek','tang','student3','6231341521','passwordKongPonEk','email_kong_pon-ek@example.com','com','อากาศร๊อนๆ',NULL),('กีกี้1','กี้กี้กี้กี้','staff','9876543','janitor01','hello@world.com',NULL,NULL,NULL);
+INSERT INTO `user` VALUES ('Thanainun','Li','professor','12345','li','email@li.com',NULL,NULL,NULL),('pun','mr','student4','6030024721','159951123','kritnatchapong@hotmail.com','ie','เทส',NULL),('pon-ek','tang','student3','6231341521','passwordKongPonEk','email_kong_pon-ek@example.com','com','อากาศร๊อนๆ','profiles/16206434996116231341521.png'),('กีกี้1','กี้กี้กี้กี้','staff','9876543','janitor01','hello@world.com',NULL,NULL,NULL);
 /*!40000 ALTER TABLE `user` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -215,4 +217,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2021-05-06  0:31:29
+-- Dump completed on 2021-05-10 17:59:26

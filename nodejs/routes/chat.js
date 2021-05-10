@@ -1,10 +1,12 @@
 const { v4: uuidv4 } = require('uuid');
 const db = require('../util/database');
+const { addSlash } = require('../util/functions');
 
 async function validateRoom(req, res, next){
     const {roomid: roomID} = req.query;
     if (!roomID){
         res.status(400).send({msg: 'roomID is not provided'});
+        return;
     }
     const query = await db.promise().query(`
         SELECT r.roomID, r.name, r.roomtype as roomType, r.lastmsg as lastMsg, r.lastmsg_time as lastMsgTime
@@ -25,6 +27,7 @@ async function validateRoom(req, res, next){
         next();
     } else {
         res.status(403).send({msg: 'User is not inside the specified room, or the room is not valid'});
+        return;
     }
 }
 
@@ -36,6 +39,7 @@ async function createRoom(req, res) {
         createRoomGroup(req, res);
     } else {
         res.status(400).send({msg: 'Unknown RoomType'});
+        return;
     }
 }
 
@@ -43,14 +47,37 @@ async function createRoomSingle(req, res) {
     var { targetID } = req.body;
     if (!targetID) {
         res.status(400).send({msg: 'Bad Request'});
+        return;
+    }
+
+    let userID1, userID2;
+    if (req.data.userID < targetID) {
+        userID1 = req.data.userID;
+        userID2 = targetID;
+    } else {
+        userID1 = targetID;
+        userID2 = req.data.userID;
+    }
+
+    const query = await db.promise().query(`
+        SELECT roomID
+        FROM room
+        WHERE roomtype = 'SINGLE' AND single_userID1 = '${userID1}' AND single_userID2 = '${userID2}'
+    `);
+    if (query[0].length >= 1) {
+        res.status(403).send({
+            msg: "User already has a 'SINGLE' type room with the targetID",
+            roomID: query[0][0].roomID
+        });
+        return;
     }
 
     const roomID = uuidv4();
     try {
         await db.promise().query(`
             INSERT INTO room
-            (roomID, name, roomtype)
-            VALUES('${roomID}', NULL, 'SINGLE')
+            (roomID, name, single_userID1, single_userID2, roomtype)
+            VALUES('${roomID}', NULL, ${userID1}, ${userID2}, 'SINGLE')
         `);
         await db.promise().query(`
             INSERT IGNORE INTO roomuser (roomID, userID)
@@ -61,26 +88,27 @@ async function createRoomSingle(req, res) {
             VALUES ('${roomID}', '${targetID}');
         `);
         res.status(200).send({
-            roomID: roomID,
-            name: null,
-            roomType: 'SINGLE',
-            members: [req.data.userID, targetID]
+            msg: 'Room created successfully',
+            roomID: roomID
         });
+        return;
     } catch (err) {
         console.log(err);
         res.status(500).send({msg: 'Internal Server Error'});
+        return;
     }
 }
 
 async function createRoomGroup(req, res) {
     var { name, targetIDs } = req.body;
-    if (!(targetIDs & Array.isArray(targetIDs))) {
+    if (!(targetIDs & Array.isArray(targetIDs) && targetIDs.every(target => typeof target === 'string'))) {
         res.status(400).send({msg: 'Bad Request'});
+        return;
     }
-    targetIDs = targetIDs.toString().split(",");
     if (!targetIDs.includes(req.data.userID)) {
         targetIDs.push(req.data.userID);
     }
+
     name = (name) ? name : targetIDs.toString();
     const roomID = uuidv4();
 
@@ -96,21 +124,17 @@ async function createRoomGroup(req, res) {
                 VALUES ('${roomID}', '${targetIDs[i]}');
             `);
         }
-        console.log({
-            roomID: roomID,
-            name: name,
-            roomType: 'GROUP',
-            members: targetIDs
-        });
         res.status(200).send({
             roomID: roomID,
             name: name,
             roomType: 'GROUP',
             members: targetIDs
         });
+        return;
     } catch (err) {
         console.log(err);
         res.status(500).send({msg: 'Internal Server Error'});
+        return;
     }
 }
 
@@ -129,74 +153,79 @@ async function getRooms(req, res) {
     
     for (var i = 0; i < query[0].length; i++) {
         const obj = query[0][i];
-        if (obj.roomType === 'SINGLE') {
-            const queryOtherMem = await db.promise().query(`
-                SELECT ru.userID, u.name, u.surname
-                FROM roomuser AS ru
-                LEFT JOIN user AS u
-                    ON ru.userID = u.userID
-                WHERE ru.roomID = '${obj.roomID}' AND ru.userID != '${req.data.userID}'
-            `);
-            if (queryOtherMem[0].length !== 1) {
-                obj.members = [req.data.userID];
-            } else {
-                obj.members = [queryOtherMem[0][0].userID, req.data.userID];
-                obj.name = queryOtherMem[0][0].name;
-            }
-        } else if (obj.roomType === 'GROUP') {
-            const queryMembers = await db.promise().query(`
-                SELECT ru.userID
-                FROM roomuser AS ru
-                LEFT JOIN user AS u
-                    ON ru.userID = u.userID
-                WHERE ru.roomID = '${obj.roomID}'
-                ORDER BY u.name ASC;
-            `);
-            obj.members = queryMembers[0].map(row => row.userID);
-        } else {
-            obj.members = [];
+        const queryMembers = await db.promise().query(`
+            SELECT ru.userID, u.name, u.surname, u.status, u.major, u.picpath
+            FROM roomuser AS ru
+            LEFT JOIN user AS u
+                ON ru.userID = u.userID
+            WHERE ru.roomID = '${obj.roomID}'
+            ORDER BY u.name ASC;
+        `);
+        obj.members = queryMembers[0].map(row => {
+            row.picpath = addSlash(row.picpath);
+            return row;
+        });
+        obj.self = obj.members.find(x => x.userID === req.data.userID);
+
+        if (obj.roomType === 'SINGLE' && obj.members.length === 2) {
+            obj.name = obj.members.find(x => x.userID !== req.data.userID).name;
         }
     }
+
     res.status(200).send(query[0]);
+    return;
 }
 
 // Including Messages History (sorted)
 async function getRoomInfo(req, res) {
     const queryChat = await db.promise().query(`
-        SELECT m.messageID, m.senderID, u.name, u.surname, u.status, m.message, m.message_type, m.sendtime
+        SELECT m.messageID, m.senderID, m.message, m.message_type as messageType, m.sendtime
         FROM message AS m
-        LEFT JOIN user AS u
-            ON m.senderID = u.userID
         WHERE m.roomID = '${req.context.room.roomID}'
         ORDER BY m.sendtime DESC;
     `);
     const queryMembers = await db.promise().query(`
-        SELECT ru.userID, u.name, u.surname, u.status
+        SELECT ru.userID, u.name, u.surname, u.status, u.major, u.picpath
         FROM roomuser AS ru
         LEFT JOIN user AS u
             ON ru.userID = u.userID
         WHERE ru.roomID = '${req.context.room.roomID}'
         ORDER BY u.name ASC;
     `);
+    queryMembers[0] = queryMembers[0].map(row => {
+        row.picpath = addSlash(row.picpath);
+        return row;
+    });
+
+    let name = req.context.room.name;
+    if (req.context.room.roomType === 'SINGLE' && queryMembers[0].length === 2) {
+        name = queryMembers[0].find(x => x.userID !== req.data.userID).name;
+    }
 
     res.status(200).send({
         roomID: req.context.room.roomID,
-        name: req.context.room.name,
+        name: name,
         roomType: req.context.room.roomtype,
         lastMsg: req.context.room.lastMsg,
         lastMsgTime: req.context.room.lastMsgTime,
+        lastMsgContext: (queryChat[0].length > 0) ? queryChat[0][0].message : null,
+        lastMsgType: (queryChat[0].length > 0) ? queryChat[0][0].messageType : null,
         members: queryMembers[0],
+        self: queryMembers[0].find(x => x.userID === req.data.userID),
         chats: queryChat[0]
     });
+    return;
 }
 
 async function inviteChat(req, res) {
     var { targetIDs } = req.body;
     if (req.context.room.roomType !== 'GROUP') {
         res.status(403).send({msg: 'The type of the specified room does not allow sending invitation to others'});
+        return;
     }
     if (!(targetIDs & Array.isArray(targetIDs))) {
         res.status(400).send({msg: 'Bad Request'});
+        return;
     }
     targetIDs = targetIDs.toString().split(",");
 
@@ -208,9 +237,11 @@ async function inviteChat(req, res) {
             `);
         }
         res.status(200).send({msg: 'Chatroom Invited'});
+        return;
     } catch (err) {
         console.log(err);
         res.status(500).send({msg: 'Internal Server Error'});
+        return;
     }
 }
 

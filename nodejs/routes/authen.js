@@ -17,9 +17,11 @@ async function validateCookie(req, res, next){
             next();
         } else {
             res.status(401).send({msg:'Not Authenticated'});
+            return;
         }
     } else {
         res.status(401).send({msg:'Not Authenticated'});
+        return;
     }
 }
 
@@ -27,6 +29,7 @@ async function signup(req, res) {
     const {name, surname, status, userID, password, email} = req.body;
     if (!(name && surname && status && userID && password && email)) {
         res.status(400).send({msg: 'Bad Request'});
+        return;
     }
 
     const ck = uuidv4();
@@ -43,12 +46,15 @@ async function signup(req, res) {
             VALUES('${userID}','${ck}')
         `);
         res.status(200).send({msg: 'Created User'});
+        return;
     } catch (err) {
         if (err.code == 'ER_DUP_ENTRY' || err.errno == 1062) {
             res.status(403).send({msg: 'userID already use'});
+            return;
         } else {
             console.log(err);
             res.status(500).send({msg: "Internal Error"});
+            return;
         }
     }
 }
@@ -57,6 +63,7 @@ async function login(req, res) {
     const {userID, password} = req.body;
     if(!(userID && password)) {
         res.status(400).send({msg: 'Bad Request'});
+        return;
     }
 
     const checklogin = await db.promise().query(`
@@ -66,6 +73,7 @@ async function login(req, res) {
     `);
     if (checklogin[0].length < 1 || checklogin[0][0].password !== password) {
         res.status(401).send({msg: 'invalid userID or password'});
+        return;
     }
 
     const ck = uuidv4();
@@ -77,13 +85,16 @@ async function login(req, res) {
             WHERE userID = '${userID}'
         `);
         res.status(200).send({msg: 'login success'});
+        return;
     } catch (err) {
         if (err.code == 'ER_DUP_ENTRY' || err.errno == 1062) {
             // Deprecated
             res.status(403).send({msg: 'There is another login'});
+            return;
         } else {
             console.log(err);
             res.status(500).send({msg: "Internal Error"});
+            return;
         }
     }
 }
@@ -99,6 +110,7 @@ async function logout(req, res) {
     } finally {
         res.status(200).send({msg:'log out'});
     }
+    return;
 }
 
 module.exports = {signup, login, logout, validateCookie};

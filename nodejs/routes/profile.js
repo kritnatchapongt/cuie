@@ -1,4 +1,43 @@
 const db = require('../util/database');
+const { addSlash } = require('../util/functions');
+const multer = require('multer');
+const path = require('path');
+
+// File upload for POST feed multipart
+const storage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        cb(null, path.join(process.env.PATH_STATIC, 'profiles'));
+    },
+    filename: (req, file, cb) => {
+        const fileName = Date.now().toString() + req.data.userID + path.extname(file.originalname);
+        const relPath = path.join('profiles', fileName);
+        const absPath = path.join(process.env.PATH_STATIC, relPath);
+        const urlPath = path.join('static', relPath);
+        const uploadData = {
+            fileName: fileName,
+            fileType: file.mimetype,
+            relPath: relPath,
+            absPath: absPath,
+            urlPath: urlPath
+        };
+        if (!req.context) {
+            req.context = {
+                upload: uploadData
+            };
+        } else {
+            req.context.upload = uploadData;
+        }
+        cb(null, fileName);
+    }
+});
+const fileFilter = (req, file, cb) => {
+    if (file.mimetype == 'image/jpeg' || file.mimetype == 'image/png') {
+        cb(null, true);
+    } else {
+        cb(null, false);
+    }
+};
+const profilePicUploadMulter = multer({ storage, fileFilter });
 
 async function getContacts(req, res) {
     var {pattern, status} = req.query;
@@ -21,12 +60,13 @@ async function getContacts(req, res) {
         students: students,
         staffs: staffs
     });
+    return;
 }
 
 async function getContactInfo(req, res) {
-    const {userid: userID} = req.query;
+    let {userid: userID} = req.query;
     if (!userID) {
-        res.status(400).send({msg: 'Bad Request'});
+        userID = req.data.userID;
     }
 
     const query = await db.promise().query(`
@@ -36,15 +76,20 @@ async function getContactInfo(req, res) {
     `);
     if (query[0].length < 1) {
         res.status(400).send({msg: 'Invalid userID'});
+        return;
     }
 
-    res.status(200).send(query[0][0]);
+    const contact = query[0][0];
+    contact.picpath = addSlash(contact.picpath);
+    res.status(200).send(contact);
+    return;
 }
 
 async function editProfile(req, res) {
     const {name, surname, status, major, bio} = req.body;
     if (!(name && surname && status && major && bio)) {
         res.status(400).send({msg: 'Bad Request'});
+        return;
     }
 
     try {
@@ -54,10 +99,31 @@ async function editProfile(req, res) {
             WHERE userID='${req.data.userID}';
         `);
         res.status(200).send({name, surname, status, major, bio});
+        return;
     } catch (err) {
         console.log(err);
         res.status(500).send({msg: "Internal Error"});
+        return;
     }
 }
 
-module.exports = {getContacts, getContactInfo, editProfile};
+async function editProfilePic(req, res) {
+    if (!req.context.upload) {
+        res.status(500).send({msg: "File upload failed"});
+        return;
+    }
+
+    const filePath = req.context.upload.relPath;
+    const userID = req.data.userID;
+
+    await db.promise().query(`
+        UPDATE user
+        SET picpath = '${filePath}'
+        WHERE userID = '${userID}';
+    `);
+
+    res.status(200).send({msg: 'Profile picture updated successfully'});
+    return;
+}
+
+module.exports = {profilePicUploadMulter, getContacts, getContactInfo, editProfile, editProfilePic};

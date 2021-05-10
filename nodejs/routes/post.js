@@ -1,4 +1,5 @@
 const db = require('../util/database');
+const { addSlash } = require('../util/functions');
 const { v4: uuidv4 } = require('uuid');
 const multer = require('multer');
 const path = require('path');
@@ -41,11 +42,13 @@ const postFeedUploadMulter = multer({ storage, fileFilter });
 
 async function postFeed(req, res){
     const {head, body, targets} = JSON.parse(req.body.info);
-    if (!(head && body && targets && Array.isArray(targets))) {
+    if (!(head && body && targets && Array.isArray(targets) && targets.every(target => typeof target === 'string'))) {
         res.status(400).send({msg: "Bad Request"});
+        return;
     }
     if (!req.context.upload) {
         res.status(500).send({msg: "File upload failed"});
+        return;
     }
 
     const filePath = req.context.upload.relPath;
@@ -57,17 +60,16 @@ async function postFeed(req, res){
         VALUE('${postid}', '${head}', '${body}', '${senderID}', '${filePath}')
     `);
 
-    const targetStr = targets.toString();
-    const targetsplit = targetStr.split(",");
-    for(var i = 0; i < targetsplit.length; i++) {
+    for(var i = 0; i < targets.length; i++) {
         db.promise().query(`
             INSERT INTO posttarget
             (postID, target)
-            VALUE('${postid}', '${targetsplit[i]}')
+            VALUE('${postid}', '${targets[i]}')
         `);
     }
     
-    res.status(200).send({msg: 'File uploaded successfully'});
+    res.status(200).send({msg: 'Feed posted successfully'});
+    return;
 }
 
 async function getFeeds(req, res){
@@ -83,7 +85,12 @@ async function getFeeds(req, res){
             WHERE p.senderID = '${req.data.userID}'
         ORDER BY posttime DESC;
     `);
-    res.status(200).send(query[0]);
+    const feeds = query[0].map(row => {
+        row.filepath = addSlash(row.filepath);
+        return row;
+    });
+    res.status(200).send(feeds);
+    return;
 }
 
 module.exports = {postFeedUploadMulter, postFeed, getFeeds};
