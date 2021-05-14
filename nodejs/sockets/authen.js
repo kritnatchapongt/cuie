@@ -20,6 +20,7 @@ function validateSocket(io, socket, events) {
                 WHERE socketID = '${socket.id}'
             `);
             if (query[0].length < 1) {
+                socket.data.isLogin = false;
                 io.to(socket.id).emit(eventName + ':response', {
                     success: false,
                     status: 401,
@@ -108,14 +109,14 @@ function login(io, socket) {
 function disconnect(io, socket) {
     return async function (obj) {
         if (obj) {
-            console.log(obj);
+            console.log(obj + ' ' + socket.id);
         }
         if (socket.data && socket.data.isLogin) {
             try {
                 await db.promise().query(`
                     UPDATE cookie
                     SET socketID = NULL
-                    WHERE userID = '${socket.data.userID}'
+                    WHERE userID = '${socket.data.userID}' AND socketID = '${socket.id}'
                 `);
             } catch (err) {
                 console.log(err);

@@ -5,7 +5,7 @@ const {datesql} = require('../util/functions');
 function sendChat(io, socket) {
     return async function (req) {
         // Input Validation
-        const {roomID, message, type: messageType} = req;
+        const {roomID, message, messageType} = req;
         if (!roomID || !message || !messageType) {
             io.to(socket.id).emit('chat:send:response', {
                 success: false,
@@ -22,7 +22,7 @@ function sendChat(io, socket) {
             FROM room as r
             INNER JOIN roomuser as ru
                 ON r.roomID = ru.roomID
-            WHERE r.roomID = '${roomID}' AND ru.userID = '${req.data.userID}'
+            WHERE r.roomID = '${roomID}' AND ru.userID = '${socket.data.userID}'
         `);
         if(query[0].length <= 0){
             io.to(socket.id).emit('chat:send:response', {
@@ -45,6 +45,11 @@ function sendChat(io, socket) {
                 (messageID, roomID, senderID, message, message_type, sendtime)
                 VALUES ('${messageID}', '${roomID}', '${senderID}', '${message}', '${messageType}', '${sendtime}');
             `);
+            await db.promise().query(`
+                UPDATE room
+                SET lastmsg = '${messageID}', lastmsg_time = '${sendtime}'
+                WHERE roomID = '${roomID}';            
+            `);
         } catch (err) {
             console.log(err);
             io.to(socket.id).emit('chat:send:response', {
@@ -58,6 +63,7 @@ function sendChat(io, socket) {
 
         io.sockets.in(roomID).emit('chat:receive', {
             messageID: messageID,
+            roomID: roomID,
             senderID: senderID,
             message: message,
             messageType: messageType,

@@ -1,5 +1,4 @@
 const {v4: uuidv4} = require('uuid');
-const db = require('../util/database');
 const {datesql} = require('../util/functions');
 const {validateSocket, login, disconnect} = require('./authen');
 const { sendChat } = require('./chat');
@@ -14,7 +13,11 @@ function createSocketMapper(io) {
                 'test_chatroom' [ChatSendOb     => Send chat to any roomID without saving into database
             APIs:
                 'signin' [LoginObj]             => First event to be emitted, in order to join chatrooms properly
+                                                => Respond with 'signin:response'
                 'chat:send' [ChatSendObj]       => Send chat to any roomID (that is accessible to the user)
+                                                => [Required Signing in first]
+                                                => Respond with 'chat:send:response'
+                                                => Receive chat from anyone with 'chat:receive'
 
         Clients are required to prepare receiving each events as followed:
             Defaults:
@@ -41,6 +44,7 @@ function createSocketMapper(io) {
             }
             ChatReceiveObj {
                 messageID: string
+                roomID: string
                 senderID: string
                 message: string
                 messageType: string ('TEXT')
@@ -52,6 +56,15 @@ function createSocketMapper(io) {
                 message: string
                 param: any
             }
+
+        Examples:
+            'signin':
+                - {"userID": "6030024721", "password": "159951123"}
+                - {"userID": "6231341521", "password": "passwordKongPonEk"}
+            'chat:send':
+                - {"roomID": "cc97e4f4-12e2-4f0c-9a6d-0a0b28699b47", "message": "ไรของมึง", "messageType": "TEXT"}
+                - {"roomID": "cc97e4f4-12e2-4f0c-9a6d-0a0b28699b47", "message": "แล้วมึงจะทำไมอ่ะ", "messageType": "TEXT"}
+                - {"roomID": "852e5d94-7738-4bbb-9550-e719b348dd9b", "message": "สวัสดีวันจันทร์", "messageType": "TEXT"}
         */
 
         console.log('Connected ' + socket.id);
@@ -66,9 +79,16 @@ function createSocketMapper(io) {
             io.to(socket.id).emit('test_private:receive', obj);
         });
         socket.on('test_chatroom', async function (obj) {
-            const { roomID, message } = obj;
+            const { roomID, message, messageType } = obj;
             console.log('[' + roomID + '] ' + socket.id + ': ' + message);
-            io.in(roomID).emit('chat:receive', message);
+            io.in(roomID).emit('chat:receive', {
+                messageID: uuidv4(),
+                roomID: roomID,
+                senderID: null,
+                message: message,
+                messageType: messageType,
+                sendtime: datesql(new Date())
+            });
         });
         
         socket.on('signin', login(io, socket));
