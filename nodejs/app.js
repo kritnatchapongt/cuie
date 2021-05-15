@@ -23,7 +23,6 @@ app.use((req, res, next) => {
     next();
 });
 app.use(router);
-app.use('/', express.static('/usr/src/app/public'));
 
 io.on('connection', createSocketMapper(io));
 

@@ -1,6 +1,44 @@
 const { v4: uuidv4 } = require('uuid');
+const multer = require('multer');
+const path = require('path');
 const db = require('../util/database');
 const { addSlash } = require('../util/functions');
+
+// File upload for PUT Profile Pic multipart
+const storage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        cb(null, path.join(process.env.PATH_STATIC, 'groups'));
+    },
+    filename: (req, file, cb) => {
+        const fileName = Date.now().toString() + req.context.room.roomID + path.extname(file.originalname);
+        const relPath = path.join('groups', fileName);
+        const absPath = path.join(process.env.PATH_STATIC, relPath);
+        const urlPath = path.join('static', relPath);
+        const uploadData = {
+            fileName: fileName,
+            fileType: file.mimetype,
+            relPath: relPath,
+            absPath: absPath,
+            urlPath: urlPath
+        };
+        if (!req.context) {
+            req.context = {
+                upload: uploadData
+            };
+        } else {
+            req.context.upload = uploadData;
+        }
+        cb(null, fileName);
+    }
+});
+const fileFilter = (req, file, cb) => {
+    if (file.mimetype == 'image/jpeg' || file.mimetype == 'image/png') {
+        cb(null, true);
+    } else {
+        cb(null, false);
+    }
+};
+const groupPicUploadMulter = multer({ storage, fileFilter });
 
 async function validateRoom(req, res, next){
     const {roomid: roomID} = req.query;
@@ -9,7 +47,7 @@ async function validateRoom(req, res, next){
         return;
     }
     const query = await db.promise().query(`
-        SELECT r.roomID, r.name, r.roomtype as roomType, r.lastmsg as lastMsg, r.lastmsg_time as lastMsgTime
+        SELECT r.roomID, r.name, r.group_picpath as picpath, r.roomtype as roomType, r.lastmsg as lastMsg, r.lastmsg_time as lastMsgTime
         FROM room as r
         INNER JOIN roomuser as ru
             ON r.roomID = ru.roomID
@@ -140,7 +178,7 @@ async function createRoomGroup(req, res) {
 
 async function getRooms(req, res) {
     const query = await db.promise().query(`
-        SELECT r.roomID, r.name, r.roomtype as roomType, r.lastmsg as lastMsg,
+        SELECT r.roomID, r.name, r.group_picpath as picpath, r.roomtype as roomType, r.lastmsg as lastMsg,
             m.sendtime as lastMsgTime, m.message as lastMsgContext, m.message_type as lastMsgType
         FROM room as r
         INNER JOIN roomuser as ru
@@ -161,14 +199,17 @@ async function getRooms(req, res) {
             WHERE ru.roomID = '${obj.roomID}'
             ORDER BY u.name ASC;
         `);
+        obj.picpath = addSlash(obj.picpath);
         obj.members = queryMembers[0].map(row => {
             row.picpath = addSlash(row.picpath);
             return row;
         });
-        obj.self = obj.members.find(x => x.userID === req.data.userID);
+        obj.owner = obj.members.find(x => x.userID === req.data.userID);
 
         if (obj.roomType === 'SINGLE' && obj.members.length === 2) {
-            obj.name = obj.members.find(x => x.userID !== req.data.userID).name;
+            const other = obj.members.find(x => x.userID !== req.data.userID);
+            obj.name = other.name;
+            obj.picpath = other.picpath;
         }
     }
 
@@ -182,7 +223,7 @@ async function getRoomInfo(req, res) {
         SELECT m.messageID, m.senderID, m.message, m.message_type as messageType, m.sendtime
         FROM message AS m
         WHERE m.roomID = '${req.context.room.roomID}'
-        ORDER BY m.sendtime DESC;
+        ORDER BY m.sendtime ASC;
     `);
     const queryMembers = await db.promise().query(`
         SELECT ru.userID, u.name, u.surname, u.status, u.major, u.picpath
@@ -205,15 +246,31 @@ async function getRoomInfo(req, res) {
     res.status(200).send({
         roomID: req.context.room.roomID,
         name: name,
+        picpath: addSlash(req.context.room.picpath),
         roomType: req.context.room.roomtype,
-        lastMsg: req.context.room.lastMsg,
-        lastMsgTime: req.context.room.lastMsgTime,
-        lastMsgContext: (queryChat[0].length > 0) ? queryChat[0][0].message : null,
-        lastMsgType: (queryChat[0].length > 0) ? queryChat[0][0].messageType : null,
         members: queryMembers[0],
-        self: queryMembers[0].find(x => x.userID === req.data.userID),
+        owner: queryMembers[0].find(x => x.userID === req.data.userID),
         chats: queryChat[0]
     });
+    return;
+}
+
+async function editGroupPic(req, res) {
+    if (!req.context.upload) {
+        res.status(500).send({msg: "File upload failed"});
+        return;
+    }
+
+    const filePath = req.context.upload.relPath;
+    const roomID = req.context.room.roomID;
+
+    await db.promise().query(`
+        UPDATE room
+        SET group_picpath = '${filePath}'
+        WHERE roomID = '${roomID}';
+    `);
+
+    res.status(200).send({msg: 'Profile picture updated successfully'});
     return;
 }
 
@@ -245,4 +302,4 @@ async function inviteChat(req, res) {
     }
 }
 
-module.exports = { validateRoom, createRoom, getRooms, getRoomInfo, inviteChat };
+module.exports = { groupPicUploadMulter, validateRoom, createRoom, getRooms, getRoomInfo, editGroupPic, inviteChat };

@@ -3,7 +3,7 @@ const { addSlash } = require('../util/functions');
 const multer = require('multer');
 const path = require('path');
 
-// File upload for POST feed multipart
+// File upload for PUT Profile Pic multipart
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
         cb(null, path.join(process.env.PATH_STATIC, 'profiles'));

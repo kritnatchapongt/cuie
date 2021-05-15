@@ -4,6 +4,7 @@ services:
     app:
         image: node:14
         container_name: cuie-app
+        restart: always
         environment:
             DB_DATABASE: ${DB_DATABASE}
             DB_USERNAME: ${DB_USERNAME}
@@ -22,6 +23,7 @@ services:
         container_name: cuie-db
         build:
             context: ./mysql
+        restart: always
         environment:
             MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
             MYSQL_DATABASE: ${DB_DATABASE}
