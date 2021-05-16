@@ -74,19 +74,25 @@ async function postFeed(req, res){
 
 async function getFeeds(req, res){
     const query = await db.promise().query(`
-        SELECT p.postID, p.head, p.body, p.senderID, p.posttime, p.filepath
-            FROM post as p
-            INNER JOIN posttarget as pt
-                ON p.postID = pt.postID
-            WHERE pt.target = '${req.data.userID}'
-        UNION
-        SELECT p.postID, p.head, p.body, p.senderID, p.posttime, p.filepath
-            FROM post as p
-            WHERE p.senderID = '${req.data.userID}'
+        SELECT p.postID, p.head, p.body, p.senderID, p.posttime, p.filepath, u.name as senderName, u.surname as senderSurname, u.status as senderStatus, u.major as senderMajor, u.picpath as senderPicpath
+        FROM user as u
+        RIGHT JOIN (
+                SELECT p.postID, p.head, p.body, p.senderID, p.posttime, p.filepath
+                    FROM post as p
+                    INNER JOIN posttarget as pt
+                        ON p.postID = pt.postID
+                    WHERE pt.target = '${req.data.userID}'
+                UNION
+                SELECT p.postID, p.head, p.body, p.senderID, p.posttime, p.filepath
+                    FROM post as p
+                    WHERE p.senderID = '${req.data.userID}'
+            ) as p
+            ON p.senderID = u.userID
         ORDER BY posttime DESC;
     `);
     const feeds = query[0].map(row => {
         row.filepath = addSlash(row.filepath);
+        row.senderPicpath = addSlash(row.senderPicpath);
         return row;
     });
     res.status(200).send(feeds);
