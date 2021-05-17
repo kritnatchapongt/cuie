@@ -1,6 +1,6 @@
 const {v4: uuidv4} = require('uuid');
 const db = require('../util/database');
-const {datesql} = require('../util/functions');
+const {datesql, dateISO} = require('../util/functions');
 
 function sendChat(io, socket) {
     return async function (req) {
@@ -61,13 +61,13 @@ function sendChat(io, socket) {
             return;
         }
 
-        io.sockets.in(roomID).emit('chat:receive', {
+        socket.to(roomID).emit('chat:receive', {
             messageID: messageID,
             roomID: roomID,
             senderID: senderID,
             message: message,
             messageType: messageType,
-            sendtime: sendtime
+            sendtime: dateISO(sendtime)
         });
 
         io.to(socket.id).emit('chat:send:response', {

@@ -45,16 +45,19 @@ async function getContacts(req, res) {
     status = (status) ? `%${status}%` : '%';
     
     const query = await db.promise().query(`
-        SELECT userID, name, surname, status
+        SELECT userID, name, surname, status, picpath
         FROM user
-        WHERE (name LIKE '${pattern}' OR surname LIKE '${pattern}') AND status LIKE '${status}';
+        WHERE (name LIKE '${pattern}' OR surname LIKE '${pattern}') AND status LIKE '${status}' AND userID != '${req.data.userID}';
     `);
-
-    const users = query[0];
+    
+    const users = query[0].map(row => {
+        row.picpath = addSlash(row.picpath);
+        return row;
+    });
     const professors = users.filter(user => user.status.includes('professor'));
     const students = users.filter(user => user.status.includes('student'));
     const staffs = users.filter(user => user.status.includes('staff'));
-    res.status(200).send({ 
+    res.status(200).send({
         all: users,
         professors: professors,
         students: students,
