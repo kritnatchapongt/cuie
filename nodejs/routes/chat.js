@@ -69,18 +69,6 @@ async function validateRoom(req, res, next){
     }
 }
 
-async function createRoom(req, res) {
-    var { roomType } = req.body;
-    if (roomType === 'SINGLE') {
-        createRoomSingle(req, res);
-    } else if (roomType === 'GROUP') {
-        createRoomGroup(req, res);
-    } else {
-        res.status(400).send({msg: 'Unknown RoomType'});
-        return;
-    }
-}
-
 async function createRoomSingle(req, res) {
     var { targetID } = req.body;
     if (!targetID) {
@@ -139,7 +127,7 @@ async function createRoomSingle(req, res) {
 
 async function createRoomGroup(req, res) {
     var { name, targetIDs } = req.body;
-    if (!(targetIDs & Array.isArray(targetIDs) && targetIDs.every(target => typeof target === 'string'))) {
+    if (!(targetIDs && Array.isArray(targetIDs) && targetIDs.every(target => typeof target === 'string'))) {
         res.status(400).send({msg: 'Bad Request'});
         return;
     }
@@ -302,4 +290,4 @@ async function inviteChat(req, res) {
     }
 }
 
-module.exports = { groupPicUploadMulter, validateRoom, createRoom, getRooms, getRoomInfo, editGroupPic, inviteChat };
+module.exports = { groupPicUploadMulter, validateRoom, createRoomSingle, createRoomGroup, getRooms, getRoomInfo, editGroupPic, inviteChat };

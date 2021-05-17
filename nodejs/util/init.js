@@ -10,6 +10,10 @@ function initStaticFolder() {
     if (!fs.existsSync(dirProfiles)){
         fs.mkdirSync(dirProfiles);
     }
+    const dirGroups = path.join(process.env.PATH_STATIC, 'groups');
+    if (!fs.existsSync(dirGroups)){
+        fs.mkdirSync(dirGroups);
+    }
 }
 
 module.exports = {initStaticFolder};
