@@ -268,11 +268,26 @@ async function inviteChat(req, res) {
         res.status(403).send({msg: 'The type of the specified room does not allow sending invitation to others'});
         return;
     }
-    if (!(targetIDs & Array.isArray(targetIDs))) {
+    if (!(targetIDs && Array.isArray(targetIDs) && targetIDs.every(target => typeof target === 'string'))) {
         res.status(400).send({msg: 'Bad Request'});
         return;
     }
-    targetIDs = targetIDs.toString().split(",");
+
+    const queryMembers = await db.promise().query(`
+        SELECT ru.userID
+        FROM roomuser AS ru
+        LEFT JOIN user AS u
+            ON ru.userID = u.userID
+        WHERE ru.roomID = '${req.context.room.roomID}'
+        ORDER BY u.name ASC;
+    `);
+    const dbUserIDs = queryMembers[0].map(row => {
+        return row.userID;
+    });
+    if (targetIDs.every(val => dbUserIDs.includes(val))) {
+        res.status(422).send({msg: 'All of the targetIDs are already in invited'});
+        return;
+    }
 
     try {
         for (var i = 0; i < targetIDs.length; i++) {
