@@ -87,6 +87,31 @@ The source codes are mainly divided into 2 main folders: `mysql/` and `nodejs/` 
 
 `000_init.sql` inside `mysql/` will ***only*** be loaded the first time `docker-compose up` is run (in other words, the scripts inside `mysql/` will not be executed as long as the `volumes/` still exists). If you are to add more initialization scripts, please follow the `000` indexing as MySQL will execute these scripts ordered by their names alphabetically.
 
+Some of the important files and folders inside `nodejs/` are as followed:
+
+```text
+nodejs/
+|
+│   app.js              => Initialize app engine
+│
+├───routes              => All HTTP Endpoints
+│       authen.js
+│       chat.js
+│       post.js
+│       profile.js
+│       router.js       => Map endpoint paths to functions
+│
+├───sockets             => All Socket Endpoints
+│       authen.js
+│       chat.js
+│       map.js          => Map endpoint paths to functions
+│
+└───util
+        database.js     => Connect database
+        functions.js    => Utility Functions
+        init.js         => Script for Required Initializations
+```
+
 ## Contributing
 
 Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
