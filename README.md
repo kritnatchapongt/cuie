@@ -72,9 +72,33 @@ All API endpoints are seperated into 2 protocols: HTTP and Socket.IO (TCP/IP). S
 
 ### HTTP
 
-POST `/signup`
+All of the endpoints are included in the Postman Collection v2.1 `CUIE Backend API.postman_collection.json`. Please import the file into Postman to investigate further. OpenAPI/Swagger v2.0 (YAML) mirror, `CUIE Backend API-SwaggerYaml.yaml`, is also provided in this same directory.
 
-Register a new user into the database
+For an overview, each endpoints are described as followed:
+
+```text
+POST /signup            => Register
+POST /signin            => Log In
+POST /signout           => Log Out
+
+/* Below this line needs authentication */
+GET /user/contacts      => Get all contacts in database except the user
+GET /user/contact       => Get anyone contact in depth (including user's profile)
+PUT /user/profile       => Update user profile
+PUT /user/profile/pic   => Update user picture
+
+POST /user/feed         => Post new feed
+GET /user/feeds         => Get user's feed (Only post that targets the user OR the user is the owner)
+
+POST /user/room/single  => Create SINGLE chatroom with someone
+POST /user/room/group   => Create GROUP chatroom with anyone(s)
+GET /user/rooms         => Get all rooms that the user is in
+GET /user/room/info     => Get the room info with all chat history
+PUT /user/room/pic      => Update room's picture
+POST /user/room/invite  => Invite more user into the room (GROUP chatroom only)
+
+GET /static/...         => Get files or pictures
+```
 
 ### SocketIO
 

@@ -1,0 +1,1756 @@
+swagger: '2.0'
+info:
+  version: '1.0'
+  title: CUIE Backend API
+  contact: {}
+host: example.com
+basePath: /
+schemes:
+- http
+consumes:
+- application/json
+produces:
+- application/json
+paths:
+  /signup:
+    post:
+      summary: Sign Up
+      tags:
+      - Authentication
+      operationId: SignUp
+      deprecated: false
+      produces:
+      - application/json; charset=utf-8
+      parameters:
+      - name: Body
+        in: body
+        required: true
+        description: ''
+        schema:
+          $ref: '#/definitions/SignUpRequest'
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/SignUp'
+          examples:
+            application/json; charset=utf-8:
+              msg: Created User
+          headers:
+            X-Powered-By:
+              type: string
+              default: Express
+            Set-Cookie:
+              type: string
+              default: session_id=c96db6c5-c3c0-4221-8993-3ea9fb4c5c13; Path=/
+            Content-Length:
+              type: string
+              default: '22'
+            ETag:
+              type: string
+              default: W/"16-mLz+VR/8v3nMwV2uNaDXrPq6IZk"
+            Date:
+              type: string
+              default: Thu, 27 May 2021 19:54:06 GMT
+            Connection:
+              type: string
+              default: keep-alive
+            Keep-Alive:
+              type: string
+              default: timeout=5
+  /signin:
+    post:
+      summary: Sign In
+      tags:
+      - Authentication
+      operationId: SignIn
+      deprecated: false
+      produces:
+      - application/json; charset=utf-8
+      parameters:
+      - name: Body
+        in: body
+        required: true
+        description: ''
+        schema:
+          $ref: '#/definitions/SignInRequest'
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/SignIn'
+          examples:
+            application/json; charset=utf-8:
+              msg: login success
+          headers:
+            X-Powered-By:
+              type: string
+              default: Express
+            Set-Cookie:
+              type: string
+              default: session_id=3ffe114e-1c5b-491b-b954-8c3ff44306db; Path=/
+            Content-Length:
+              type: string
+              default: '23'
+            ETag:
+              type: string
+              default: W/"17-M8+0Mqa3/ylrolcUPVRiJQJCrdk"
+            Date:
+              type: string
+              default: Thu, 27 May 2021 19:53:21 GMT
+            Connection:
+              type: string
+              default: keep-alive
+            Keep-Alive:
+              type: string
+              default: timeout=5
+  /signout:
+    post:
+      summary: Sign Out
+      tags:
+      - Authentication
+      operationId: SignOut
+      deprecated: false
+      produces:
+      - application/json; charset=utf-8
+      parameters: []
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/SignOut'
+          examples:
+            application/json; charset=utf-8:
+              msg: log out
+          headers:
+            X-Powered-By:
+              type: string
+              default: Express
+            Set-Cookie:
+              type: string
+              default: c96db6c5-c3c0-4221-8993-3ea9fb4c5c13=; Path=/; Expires=Thu, 01 Jan 1970 00:00:00 GMT
+            Content-Length:
+              type: string
+              default: '17'
+            ETag:
+              type: string
+              default: W/"11-eAa8ECVmCmytZcfJ+EB0sszb7lw"
+            Date:
+              type: string
+              default: Thu, 27 May 2021 19:54:17 GMT
+            Connection:
+              type: string
+              default: keep-alive
+            Keep-Alive:
+              type: string
+              default: timeout=5
+  /user/contact:
+    get:
+      summary: Personal Profile
+      tags:
+      - Contact & Profile
+      operationId: PersonalProfile
+      deprecated: false
+      produces:
+      - application/json; charset=utf-8
+      parameters: []
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/PersonalProfile'
+          examples:
+            application/json; charset=utf-8:
+              userID: '6231341521'
+              name: pon-ek
+              surname: tang
+              status: student3
+              email: email_kong_pon-ek@example.com
+              bio: อากาศร๊อนๆ
+              picpath: /static/profiles/16209699428426231341521.png
+          headers:
+            X-Powered-By:
+              type: string
+              default: Express
+            Content-Length:
+              type: string
+              default: '212'
+            ETag:
+              type: string
+              default: W/"d4-eDmgyglpKANrIdMuJHuGIVLYrvs"
+            Date:
+              type: string
+              default: Thu, 27 May 2021 20:26:41 GMT
+            Connection:
+              type: string
+              default: keep-alive
+            Keep-Alive:
+              type: string
+              default: timeout=5
+  /user/contacts:
+    get:
+      summary: Contacts List
+      tags:
+      - Contact & Profile
+      operationId: ContactsList
+      deprecated: false
+      produces:
+      - application/json; charset=utf-8
+      parameters:
+      - name: pattern
+        in: query
+        required: true
+        type: string
+        description: ''
+      - name: status
+        in: query
+        required: true
+        type: string
+        description: ''
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/ContactsList'
+          examples:
+            application/json; charset=utf-8:
+              all:
+              - userID: '6200000021'
+                name: pon-ek
+                surname: ponpon
+                status: student2
+                picpath: ''
+              - userID: '6231373621'
+                name: pon-ek
+                surname: ponpon
+                status: student2
+                picpath: ''
+              professors: []
+              students:
+              - userID: '6200000021'
+                name: pon-ek
+                surname: ponpon
+                status: student2
+                picpath: ''
+              - userID: '6231373621'
+                name: pon-ek
+                surname: ponpon
+                status: student2
+                picpath: ''
+              staffs: []
+          headers:
+            X-Powered-By:
+              type: string
+              default: Express
+            Content-Length:
+              type: string
+              default: '426'
+            ETag:
+              type: string
+              default: W/"1aa-VOUpNWKJFNjHPFUN6bD9fN9/Gus"
+            Date:
+              type: string
+              default: Thu, 27 May 2021 20:27:01 GMT
+            Connection:
+              type: string
+              default: keep-alive
+            Keep-Alive:
+              type: string
+              default: timeout=5
+  /user/profile:
+    put:
+      summary: Edit Profile
+      tags:
+      - Contact & Profile
+      operationId: EditProfile
+      deprecated: false
+      produces:
+      - application/json; charset=utf-8
+      parameters:
+      - name: Body
+        in: body
+        required: true
+        description: ''
+        schema:
+          $ref: '#/definitions/EditProfileRequest'
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/EditProfile'
+          examples:
+            application/json; charset=utf-8:
+              name: pon
+              surname: tang
+              status: student3
+              major: com
+              bio: อากาศร๊อนๆ
+          headers:
+            X-Powered-By:
+              type: string
+              default: Express
+            Content-Length:
+              type: string
+              default: '104'
+            ETag:
+              type: string
+              default: W/"68-NByrzSPPWh4XCPIP4Bj7r6RaXPU"
+            Date:
+              type: string
+              default: Thu, 27 May 2021 20:27:16 GMT
+            Connection:
+              type: string
+              default: keep-alive
+            Keep-Alive:
+              type: string
+              default: timeout=5
+  /user/profile/pic:
+    put:
+      summary: Update Profile Picture
+      tags:
+      - Contact & Profile
+      operationId: UpdateProfilePicture
+      deprecated: false
+      produces:
+      - application/json; charset=utf-8
+      consumes:
+      - application/x-www-form-urlencoded
+      parameters:
+      - name: picture
+        in: formData
+        required: true
+        type: string
+        description: ''
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/UpdateProfilePicture'
+          examples:
+            application/json; charset=utf-8:
+              msg: Profile picture updated successfully
+          headers:
+            X-Powered-By:
+              type: string
+              default: Express
+            Content-Length:
+              type: string
+              default: '46'
+            ETag:
+              type: string
+              default: W/"2e-UHQd0IJAVPT4UniGXFRGgi2H+Bw"
+            Date:
+              type: string
+              default: Thu, 27 May 2021 20:27:27 GMT
+            Connection:
+              type: string
+              default: keep-alive
+            Keep-Alive:
+              type: string
+              default: timeout=5
+  /user/feeds:
+    get:
+      summary: View My Feeds
+      tags:
+      - Feed Wall
+      operationId: ViewMyFeeds
+      deprecated: false
+      produces:
+      - application/json; charset=utf-8
+      parameters: []
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/ViewMyFeed'
+          examples:
+            application/json; charset=utf-8:
+            - postID: dfea7742-847e-4334-b6dc-77849b964682
+              head: นี่คือหัวข้อ
+              body: wowowowowowowowowowowo เทสภาษาไทย
+              senderID: '6231341521'
+              posttime: 2021-05-05T07:51:37Z
+              filepath: /static/files/16202010974166231341521.jpg
+              senderName: pon
+              senderSurname: tang
+              senderStatus: student3
+              senderMajor: com
+              senderPicpath: /static/profiles/16221472470696231341521.png
+          headers:
+            X-Powered-By:
+              type: string
+              default: Express
+            Content-Length:
+              type: string
+              default: '428'
+            ETag:
+              type: string
+              default: W/"1ac-d7mV+GnWlsGwphuujLbXD4OuZyU"
+            Date:
+              type: string
+              default: Thu, 27 May 2021 20:27:38 GMT
+            Connection:
+              type: string
+              default: keep-alive
+            Keep-Alive:
+              type: string
+              default: timeout=5
+  /user/feed:
+    post:
+      summary: New Feed
+      tags:
+      - Feed Wall
+      operationId: NewFeed
+      deprecated: false
+      produces:
+      - application/json; charset=utf-8
+      consumes:
+      - application/x-www-form-urlencoded
+      parameters:
+      - name: files
+        in: formData
+        required: true
+        type: string
+        description: ''
+      - name: info
+        in: formData
+        required: true
+        type: string
+        description: ''
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/NewFeed'
+          examples:
+            application/json; charset=utf-8:
+              msg: Feed posted successfully
+          headers:
+            X-Powered-By:
+              type: string
+              default: Express
+            Content-Length:
+              type: string
+              default: '34'
+            ETag:
+              type: string
+              default: W/"22-lHXeY7UgqhKxwLvAbAGt0T5R3Vw"
+            Date:
+              type: string
+              default: Thu, 27 May 2021 20:31:22 GMT
+            Connection:
+              type: string
+              default: keep-alive
+            Keep-Alive:
+              type: string
+              default: timeout=5
+  /user/rooms:
+    get:
+      summary: View My Rooms List
+      tags:
+      - Chat Room
+      operationId: ViewMyRoomsList
+      deprecated: false
+      produces:
+      - application/json; charset=utf-8
+      parameters: []
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/ViewMyRoomsList'
+          examples:
+            application/json; charset=utf-8:
+            - roomID: 852e5d94-7738-4bbb-9550-e719b348dd9b
+              name: Thanainun
+              picpath: /static/profiles/162108762051912345.jpg
+              roomType: SINGLE
+              lastMsg: 4ccf3715-7087-4413-80d6-ba27a61ea4fa
+              lastMsgTime: 2021-05-17T06:51:47Z
+              lastMsgContext: Fffffff
+              lastMsgType: TEXT
+              members:
+              - userID: '6231341521'
+                name: pon
+                surname: tang
+                status: student3
+                major: com
+                picpath: /static/profiles/16221472470696231341521.png
+              - userID: '12345'
+                name: Thanainun
+                surname: Li
+                status: professor
+                major: ''
+                picpath: /static/profiles/162108762051912345.jpg
+              owner:
+                userID: '6231341521'
+                name: pon
+                surname: tang
+                status: student3
+                major: com
+                picpath: /static/profiles/16221472470696231341521.png
+            - roomID: c2519f55-effc-4016-a9a7-22718e172e9b
+              name: กีกี้1
+              picpath: ''
+              roomType: SINGLE
+              lastMsg: b06a9100-7537-4963-b6e8-48a0948e9044
+              lastMsgTime: 2021-05-16T14:57:41Z
+              lastMsgContext: Fog;ๆๆๆ
+              lastMsgType: TEXT
+              members:
+              - userID: '6231341521'
+                name: pon
+                surname: tang
+                status: student3
+                major: com
+                picpath: /static/profiles/16221472470696231341521.png
+              - userID: '9876543'
+                name: กีกี้1
+                surname: กี้กี้กี้กี้
+                status: staff
+                major: ''
+                picpath: ''
+              owner:
+                userID: '6231341521'
+                name: pon
+                surname: tang
+                status: student3
+                major: com
+                picpath: /static/profiles/16221472470696231341521.png
+            - roomID: 736d07fa-9330-4b73-968e-fc085f79e645
+              name: รวมพลกีกี้
+              picpath: ''
+              roomType: GROUP
+              lastMsg: e62c3c70-a446-4248-84a4-10a07f54ac3a
+              lastMsgTime: 2021-05-15T14:42:40Z
+              lastMsgContext: Asdasdasd
+              lastMsgType: TEXT
+              members:
+              - userID: '6231341521'
+                name: pon
+                surname: tang
+                status: student3
+                major: com
+                picpath: /static/profiles/16221472470696231341521.png
+              - userID: '12345'
+                name: Thanainun
+                surname: Li
+                status: professor
+                major: ''
+                picpath: /static/profiles/162108762051912345.jpg
+              - userID: '9876543'
+                name: กีกี้1
+                surname: กี้กี้กี้กี้
+                status: staff
+                major: ''
+                picpath: ''
+              owner:
+                userID: '6231341521'
+                name: pon
+                surname: tang
+                status: student3
+                major: com
+                picpath: /static/profiles/16221472470696231341521.png
+            - roomID: chatroom01
+              name: chatroom01
+              picpath: /static/groups/1621086861626chatroom01.png
+              roomType: GROUP
+              lastMsg: 8cf0c7df-396d-4f92-b6a5-956514b49128
+              lastMsgTime: 2021-05-15T14:42:15Z
+              lastMsgContext: Asdasdas
+              lastMsgType: TEXT
+              members:
+              - userID: '6231341521'
+                name: pon
+                surname: tang
+                status: student3
+                major: com
+                picpath: /static/profiles/16221472470696231341521.png
+              - userID: '6030024721'
+                name: pun
+                surname: mr
+                status: student4
+                major: ie
+                picpath: /static/profiles/16210876631106030024721.png
+              owner:
+                userID: '6231341521'
+                name: pon
+                surname: tang
+                status: student3
+                major: com
+                picpath: /static/profiles/16221472470696231341521.png
+            - roomID: b4267180-a4b0-4556-8d29-ebeaff1c9e29
+              name: pun
+              picpath: /static/profiles/16210876631106030024721.png
+              roomType: SINGLE
+              lastMsg: 8fda2cae-3cab-4240-ad09-cc75811277a8
+              lastMsgTime: 2021-05-15T14:39:45Z
+              lastMsgContext: Asdasdasdas
+              lastMsgType: TEXT
+              members:
+              - userID: '6231341521'
+                name: pon
+                surname: tang
+                status: student3
+                major: com
+                picpath: /static/profiles/16221472470696231341521.png
+              - userID: '6030024721'
+                name: pun
+                surname: mr
+                status: student4
+                major: ie
+                picpath: /static/profiles/16210876631106030024721.png
+              owner:
+                userID: '6231341521'
+                name: pon
+                surname: tang
+                status: student3
+                major: com
+                picpath: /static/profiles/16221472470696231341521.png
+            - roomID: cc97e4f4-12e2-4f0c-9a6d-0a0b28699b47
+              name: กลุ่มลับมหัศจรรย์
+              picpath: /static/groups/1621086784453cc97e4f4-12e2-4f0c-9a6d-0a0b28699b47.png
+              roomType: GROUP
+              lastMsg: fd8804df-aba8-48c6-80a1-ea23ded546f5
+              lastMsgTime: 2021-05-14T05:07:10Z
+              lastMsgContext: ว้าวเหี้ยไรของมึง
+              lastMsgType: TEXT
+              members:
+              - userID: '6231341521'
+                name: pon
+                surname: tang
+                status: student3
+                major: com
+                picpath: /static/profiles/16221472470696231341521.png
+              - userID: '6030024721'
+                name: pun
+                surname: mr
+                status: student4
+                major: ie
+                picpath: /static/profiles/16210876631106030024721.png
+              - userID: '12345'
+                name: Thanainun
+                surname: Li
+                status: professor
+                major: ''
+                picpath: /static/profiles/162108762051912345.jpg
+              - userID: '9876543'
+                name: กีกี้1
+                surname: กี้กี้กี้กี้
+                status: staff
+                major: ''
+                picpath: ''
+              owner:
+                userID: '6231341521'
+                name: pon
+                surname: tang
+                status: student3
+                major: com
+                picpath: /static/profiles/16221472470696231341521.png
+            - roomID: 7af8504f-6995-432b-b453-0f29e0954e68
+              name: pon-ek
+              picpath: ''
+              roomType: SINGLE
+              lastMsg: ''
+              lastMsgTime: ''
+              lastMsgContext: ''
+              lastMsgType: ''
+              members:
+              - userID: '6231341521'
+                name: pon
+                surname: tang
+                status: student3
+                major: com
+                picpath: /static/profiles/16221472470696231341521.png
+              - userID: '6231373621'
+                name: pon-ek
+                surname: ponpon
+                status: student2
+                major: ''
+                picpath: ''
+              owner:
+                userID: '6231341521'
+                name: pon
+                surname: tang
+                status: student3
+                major: com
+                picpath: /static/profiles/16221472470696231341521.png
+            - roomID: db1a1076-e9ca-4470-ba2e-852709f7e772
+              name: เอ้ว
+              picpath: ''
+              roomType: GROUP
+              lastMsg: ''
+              lastMsgTime: ''
+              lastMsgContext: ''
+              lastMsgType: ''
+              members:
+              - userID: '6231341521'
+                name: pon
+                surname: tang
+                status: student3
+                major: com
+                picpath: /static/profiles/16221472470696231341521.png
+              - userID: '6030024721'
+                name: pun
+                surname: mr
+                status: student4
+                major: ie
+                picpath: /static/profiles/16210876631106030024721.png
+              owner:
+                userID: '6231341521'
+                name: pon
+                surname: tang
+                status: student3
+                major: com
+                picpath: /static/profiles/16221472470696231341521.png
+          headers:
+            X-Powered-By:
+              type: string
+              default: Express
+            Content-Length:
+              type: string
+              default: '6083'
+            ETag:
+              type: string
+              default: W/"17c3-EYxB5ORL6hk9+5tQ7pQhP8DU3YA"
+            Date:
+              type: string
+              default: Thu, 27 May 2021 20:31:32 GMT
+            Connection:
+              type: string
+              default: keep-alive
+            Keep-Alive:
+              type: string
+              default: timeout=5
+  /user/room/single:
+    post:
+      summary: Create New Room (Single)
+      tags:
+      - Chat Room
+      operationId: CreateNewRoom(Single)
+      deprecated: false
+      produces:
+      - application/json; charset=utf-8
+      parameters:
+      - name: Body
+        in: body
+        required: true
+        description: ''
+        schema:
+          $ref: '#/definitions/CreateNewRoom%28Single%29Request'
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/CreateNewRoom%28Single%29'
+          examples:
+            application/json; charset=utf-8:
+              msg: Room created successfully
+              roomID: e47496e6-a1b0-4da3-af58-da79796e0271
+          headers:
+            X-Powered-By:
+              type: string
+              default: Express
+            Content-Length:
+              type: string
+              default: '83'
+            ETag:
+              type: string
+              default: W/"53-ApgvIDGGca2mV0JluRIsNOqQ4uw"
+            Date:
+              type: string
+              default: Thu, 27 May 2021 20:32:30 GMT
+            Connection:
+              type: string
+              default: keep-alive
+            Keep-Alive:
+              type: string
+              default: timeout=5
+  /user/room/group:
+    post:
+      summary: Create New Room (Group)
+      tags:
+      - Chat Room
+      operationId: CreateNewRoom(Group)
+      deprecated: false
+      produces:
+      - application/json; charset=utf-8
+      parameters:
+      - name: Body
+        in: body
+        required: true
+        description: ''
+        schema:
+          $ref: '#/definitions/CreateNewRoom%28Group%29Request'
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/CreateNewRoom%28Group%29'
+          examples:
+            application/json; charset=utf-8:
+              roomID: 5626d42b-b926-4354-8848-c7fa0608dd23
+              name: เอ้ว
+              roomType: GROUP
+              members:
+              - '6030024721'
+              - '6231341521'
+          headers:
+            X-Powered-By:
+              type: string
+              default: Express
+            Content-Length:
+              type: string
+              default: '128'
+            ETag:
+              type: string
+              default: W/"80-qn1Cb7xV9H0LJbLo4Ji+nh29pjI"
+            Date:
+              type: string
+              default: Thu, 27 May 2021 20:32:44 GMT
+            Connection:
+              type: string
+              default: keep-alive
+            Keep-Alive:
+              type: string
+              default: timeout=5
+  /user/room/info:
+    get:
+      summary: Room Info
+      tags:
+      - Chat Room
+      operationId: RoomInfo
+      deprecated: false
+      produces:
+      - application/json; charset=utf-8
+      parameters:
+      - name: roomid
+        in: query
+        required: true
+        type: string
+        description: ''
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/RoomInfo'
+          examples:
+            application/json; charset=utf-8:
+              roomID: chatroom01
+              name: chatroom01
+              picpath: /static/groups/1621086861626chatroom01.png
+              members:
+              - userID: '6231341521'
+                name: pon
+                surname: tang
+                status: student3
+                major: com
+                picpath: /static/profiles/16221472470696231341521.png
+              - userID: '6030024721'
+                name: pun
+                surname: mr
+                status: student4
+                major: ie
+                picpath: /static/profiles/16210876631106030024721.png
+              owner:
+                userID: '6231341521'
+                name: pon
+                surname: tang
+                status: student3
+                major: com
+                picpath: /static/profiles/16221472470696231341521.png
+              chats:
+              - messageID: message01
+                senderID: '6231341521'
+                message: ยังเลยว่ะ ส่งวันไหนวะ
+                messageType: TEXT
+                sendtime: 2021-05-05T08:32:48Z
+              - messageID: message02
+                senderID: '6030024721'
+                message: ทำม็อคอังกฤษยังวะ
+                messageType: TEXT
+                sendtime: 2021-05-05T08:32:48Z
+              - messageID: 8cf0c7df-396d-4f92-b6a5-956514b49128
+                senderID: '6231341521'
+                message: Asdasdas
+                messageType: TEXT
+                sendtime: 2021-05-15T14:42:15Z
+          headers:
+            X-Powered-By:
+              type: string
+              default: Express
+            Content-Length:
+              type: string
+              default: '1073'
+            ETag:
+              type: string
+              default: W/"431-Dw4ovPLNAZsoanurvL7lAL3LBiU"
+            Date:
+              type: string
+              default: Thu, 27 May 2021 20:32:51 GMT
+            Connection:
+              type: string
+              default: keep-alive
+            Keep-Alive:
+              type: string
+              default: timeout=5
+  /user/room/pic:
+    put:
+      summary: Update Group Picture
+      tags:
+      - Chat Room
+      operationId: UpdateGroupPicture
+      deprecated: false
+      produces:
+      - application/json; charset=utf-8
+      consumes:
+      - application/x-www-form-urlencoded
+      parameters:
+      - name: roomid
+        in: query
+        required: true
+        type: string
+        description: ''
+      - name: picture
+        in: formData
+        required: true
+        type: string
+        description: ''
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/UpdateGroupPicture'
+          examples:
+            application/json; charset=utf-8:
+              msg: Profile picture updated successfully
+          headers:
+            X-Powered-By:
+              type: string
+              default: Express
+            Content-Length:
+              type: string
+              default: '46'
+            ETag:
+              type: string
+              default: W/"2e-UHQd0IJAVPT4UniGXFRGgi2H+Bw"
+            Date:
+              type: string
+              default: Thu, 27 May 2021 20:33:00 GMT
+            Connection:
+              type: string
+              default: keep-alive
+            Keep-Alive:
+              type: string
+              default: timeout=5
+  /user/room/invite:
+    post:
+      summary: Invite Others to Room
+      tags:
+      - Chat Room
+      operationId: InviteOtherstoRoom
+      deprecated: false
+      produces:
+      - application/json; charset=utf-8
+      parameters:
+      - name: roomid
+        in: query
+        required: true
+        type: string
+        description: ''
+      - name: Body
+        in: body
+        required: true
+        description: ''
+        schema:
+          $ref: '#/definitions/InviteOtherstoRoomRequest'
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/InviteOtherstoRoom'
+          examples:
+            application/json; charset=utf-8:
+              msg: Chatroom Invited
+          headers:
+            X-Powered-By:
+              type: string
+              default: Express
+            Content-Length:
+              type: string
+              default: '26'
+            ETag:
+              type: string
+              default: W/"1a-uaLLA+v9+b2JANQkWT49gvwSdgs"
+            Date:
+              type: string
+              default: Thu, 27 May 2021 20:33:17 GMT
+            Connection:
+              type: string
+              default: keep-alive
+            Keep-Alive:
+              type: string
+              default: timeout=5
+  /static/files/16202010974166231341521.jpg:
+    get:
+      summary: Random Files
+      tags:
+      - File Server
+      operationId: RandomFiles
+      deprecated: false
+      produces:
+      - application/json
+      parameters: []
+      responses:
+        default:
+          description: ''
+          headers: {}
+definitions:
+  SignUpRequest:
+    title: SignUpRequest
+    example:
+      name: pon-ek
+      surname: ponpon
+      status: student2
+      userID: '6231373621'
+      password: passwordKongPonEk
+      email: email_kong_pon-ek@example.com
+    type: object
+    properties:
+      name:
+        type: string
+      surname:
+        type: string
+      status:
+        type: string
+      userID:
+        type: string
+      password:
+        type: string
+      email:
+        type: string
+    required:
+    - name
+    - surname
+    - status
+    - userID
+    - password
+    - email
+  SignUp:
+    title: SignUp
+    example:
+      msg: Created User
+    type: object
+    properties:
+      msg:
+        type: string
+    required:
+    - msg
+  SignInRequest:
+    title: SignInRequest
+    example:
+      userID: '6231341521'
+      password: passwordKongPonEk
+    type: object
+    properties:
+      userID:
+        type: string
+      password:
+        type: string
+    required:
+    - userID
+    - password
+  SignIn:
+    title: SignIn
+    example:
+      msg: login success
+    type: object
+    properties:
+      msg:
+        type: string
+    required:
+    - msg
+  SignOut:
+    title: SignOut
+    example:
+      msg: log out
+    type: object
+    properties:
+      msg:
+        type: string
+    required:
+    - msg
+  PersonalProfile:
+    title: PersonalProfile
+    example:
+      userID: '6231341521'
+      name: pon-ek
+      surname: tang
+      status: student3
+      email: email_kong_pon-ek@example.com
+      bio: อากาศร๊อนๆ
+      picpath: /static/profiles/16209699428426231341521.png
+    type: object
+    properties:
+      userID:
+        type: string
+      name:
+        type: string
+      surname:
+        type: string
+      status:
+        type: string
+      email:
+        type: string
+      bio:
+        type: string
+      picpath:
+        type: string
+    required:
+    - userID
+    - name
+    - surname
+    - status
+    - email
+    - bio
+    - picpath
+  ContactsList:
+    title: ContactsList
+    example:
+      all:
+      - userID: '6200000021'
+        name: pon-ek
+        surname: ponpon
+        status: student2
+        picpath: ''
+      - userID: '6231373621'
+        name: pon-ek
+        surname: ponpon
+        status: student2
+        picpath: ''
+      professors: []
+      students:
+      - userID: '6200000021'
+        name: pon-ek
+        surname: ponpon
+        status: student2
+        picpath: ''
+      - userID: '6231373621'
+        name: pon-ek
+        surname: ponpon
+        status: student2
+        picpath: ''
+      staffs: []
+    type: object
+    properties:
+      all:
+        type: array
+        items:
+          $ref: '#/definitions/All'
+      professors:
+        type: array
+        items:
+          type: string
+      students:
+        type: array
+        items:
+          $ref: '#/definitions/Student'
+      staffs:
+        type: array
+        items:
+          type: string
+    required:
+    - all
+    - professors
+    - students
+    - staffs
+  All:
+    title: All
+    example:
+      userID: '6200000021'
+      name: pon-ek
+      surname: ponpon
+      status: student2
+      picpath: ''
+    type: object
+    properties:
+      userID:
+        type: string
+      name:
+        type: string
+      surname:
+        type: string
+      status:
+        type: string
+      picpath:
+        type: string
+    required:
+    - userID
+    - name
+    - surname
+    - status
+    - picpath
+  Student:
+    title: Student
+    example:
+      userID: '6200000021'
+      name: pon-ek
+      surname: ponpon
+      status: student2
+      picpath: ''
+    type: object
+    properties:
+      userID:
+        type: string
+      name:
+        type: string
+      surname:
+        type: string
+      status:
+        type: string
+      picpath:
+        type: string
+    required:
+    - userID
+    - name
+    - surname
+    - status
+    - picpath
+  ContactInfo:
+    title: ContactInfo
+    example:
+      userID: '6231341521'
+      name: pon-ek
+      surname: tang
+      status: student3
+      email: email_kong_pon-ek@example.com
+      bio: อากาศร๊อนๆ
+      picpath: /static/profiles/16209699428426231341521.png
+    type: object
+    properties:
+      userID:
+        type: string
+      name:
+        type: string
+      surname:
+        type: string
+      status:
+        type: string
+      email:
+        type: string
+      bio:
+        type: string
+      picpath:
+        type: string
+    required:
+    - userID
+    - name
+    - surname
+    - status
+    - email
+    - bio
+    - picpath
+  EditProfileRequest:
+    title: EditProfileRequest
+    example:
+      name: pon
+      surname: tang
+      status: student3
+      major: com
+      bio: อากาศร๊อนๆ
+    type: object
+    properties:
+      name:
+        type: string
+      surname:
+        type: string
+      status:
+        type: string
+      major:
+        type: string
+      bio:
+        type: string
+    required:
+    - name
+    - surname
+    - status
+    - major
+    - bio
+  EditProfile:
+    title: EditProfile
+    example:
+      name: pon
+      surname: tang
+      status: student3
+      major: com
+      bio: อากาศร๊อนๆ
+    type: object
+    properties:
+      name:
+        type: string
+      surname:
+        type: string
+      status:
+        type: string
+      major:
+        type: string
+      bio:
+        type: string
+    required:
+    - name
+    - surname
+    - status
+    - major
+    - bio
+  UpdateProfilePicture:
+    title: UpdateProfilePicture
+    example:
+      msg: Profile picture updated successfully
+    type: object
+    properties:
+      msg:
+        type: string
+    required:
+    - msg
+  ViewMyFeed:
+    title: ViewMyFeed
+    example:
+      postID: dfea7742-847e-4334-b6dc-77849b964682
+      head: นี่คือหัวข้อ
+      body: wowowowowowowowowowowo เทสภาษาไทย
+      senderID: '6231341521'
+      posttime: 2021-05-05T07:51:37Z
+      filepath: /static/files/16202010974166231341521.jpg
+      senderName: pon
+      senderSurname: tang
+      senderStatus: student3
+      senderMajor: com
+      senderPicpath: /static/profiles/16221472470696231341521.png
+    type: object
+    properties:
+      postID:
+        type: string
+      head:
+        type: string
+      body:
+        type: string
+      senderID:
+        type: string
+      posttime:
+        type: string
+      filepath:
+        type: string
+      senderName:
+        type: string
+      senderSurname:
+        type: string
+      senderStatus:
+        type: string
+      senderMajor:
+        type: string
+      senderPicpath:
+        type: string
+    required:
+    - postID
+    - head
+    - body
+    - senderID
+    - posttime
+    - filepath
+    - senderName
+    - senderSurname
+    - senderStatus
+    - senderMajor
+    - senderPicpath
+  info:
+    title: info
+    example:
+      head: นี่คือหัวข้อ
+      body: wowowowowowowowowowowo เทสภาษาไทย
+      targets:
+      - '6231341521'
+    type: object
+    properties:
+      head:
+        type: string
+      body:
+        type: string
+      targets:
+        type: array
+        items:
+          type: string
+    required:
+    - head
+    - body
+    - targets
+  NewFeed:
+    title: NewFeed
+    example:
+      msg: Feed posted successfully
+    type: object
+    properties:
+      msg:
+        type: string
+    required:
+    - msg
+  ViewMyRoomsList:
+    title: ViewMyRoomsList
+    example:
+      roomID: 852e5d94-7738-4bbb-9550-e719b348dd9b
+      name: Thanainun
+      picpath: /static/profiles/162108762051912345.jpg
+      roomType: SINGLE
+      lastMsg: 4ccf3715-7087-4413-80d6-ba27a61ea4fa
+      lastMsgTime: 2021-05-17T06:51:47Z
+      lastMsgContext: Fffffff
+      lastMsgType: TEXT
+      members:
+      - userID: '6231341521'
+        name: pon
+        surname: tang
+        status: student3
+        major: com
+        picpath: /static/profiles/16221472470696231341521.png
+      - userID: '12345'
+        name: Thanainun
+        surname: Li
+        status: professor
+        major: ''
+        picpath: /static/profiles/162108762051912345.jpg
+      owner:
+        userID: '6231341521'
+        name: pon
+        surname: tang
+        status: student3
+        major: com
+        picpath: /static/profiles/16221472470696231341521.png
+    type: object
+    properties:
+      roomID:
+        type: string
+      name:
+        type: string
+      picpath:
+        type: string
+      roomType:
+        type: string
+      lastMsg:
+        type: string
+      lastMsgTime:
+        type: string
+      lastMsgContext:
+        type: string
+      lastMsgType:
+        type: string
+      members:
+        type: array
+        items:
+          $ref: '#/definitions/Member'
+      owner:
+        $ref: '#/definitions/Owner'
+    required:
+    - roomID
+    - name
+    - picpath
+    - roomType
+    - lastMsg
+    - lastMsgTime
+    - lastMsgContext
+    - lastMsgType
+    - members
+    - owner
+  Member:
+    title: Member
+    example:
+      userID: '6231341521'
+      name: pon
+      surname: tang
+      status: student3
+      major: com
+      picpath: /static/profiles/16221472470696231341521.png
+    type: object
+    properties:
+      userID:
+        type: string
+      name:
+        type: string
+      surname:
+        type: string
+      status:
+        type: string
+      major:
+        type: string
+      picpath:
+        type: string
+    required:
+    - userID
+    - name
+    - surname
+    - status
+    - major
+    - picpath
+  Owner:
+    title: Owner
+    example:
+      userID: '6231341521'
+      name: pon
+      surname: tang
+      status: student3
+      major: com
+      picpath: /static/profiles/16221472470696231341521.png
+    type: object
+    properties:
+      userID:
+        type: string
+      name:
+        type: string
+      surname:
+        type: string
+      status:
+        type: string
+      major:
+        type: string
+      picpath:
+        type: string
+    required:
+    - userID
+    - name
+    - surname
+    - status
+    - major
+    - picpath
+  CreateNewRoom(Single)Request:
+    title: CreateNewRoom(Single)Request
+    example:
+      targetID: '6231373621'
+    type: object
+    properties:
+      targetID:
+        type: string
+    required:
+    - targetID
+  CreateNewRoom(Single):
+    title: CreateNewRoom(Single)
+    example:
+      msg: Room created successfully
+      roomID: e47496e6-a1b0-4da3-af58-da79796e0271
+    type: object
+    properties:
+      msg:
+        type: string
+      roomID:
+        type: string
+    required:
+    - msg
+    - roomID
+  CreateNewRoom(Group)Request:
+    title: CreateNewRoom(Group)Request
+    example:
+      name: เอ้ว
+      targetIDs:
+      - '6030024721'
+      - '6231341521'
+    type: object
+    properties:
+      name:
+        type: string
+      targetIDs:
+        type: array
+        items:
+          type: string
+    required:
+    - name
+    - targetIDs
+  CreateNewRoom(Group):
+    title: CreateNewRoom(Group)
+    example:
+      roomID: 5626d42b-b926-4354-8848-c7fa0608dd23
+      name: เอ้ว
+      roomType: GROUP
+      members:
+      - '6030024721'
+      - '6231341521'
+    type: object
+    properties:
+      roomID:
+        type: string
+      name:
+        type: string
+      roomType:
+        type: string
+      members:
+        type: array
+        items:
+          type: string
+    required:
+    - roomID
+    - name
+    - roomType
+    - members
+  RoomInfo:
+    title: RoomInfo
+    example:
+      roomID: chatroom01
+      name: chatroom01
+      picpath: /static/groups/1621086861626chatroom01.png
+      members:
+      - userID: '6231341521'
+        name: pon
+        surname: tang
+        status: student3
+        major: com
+        picpath: /static/profiles/16221472470696231341521.png
+      - userID: '6030024721'
+        name: pun
+        surname: mr
+        status: student4
+        major: ie
+        picpath: /static/profiles/16210876631106030024721.png
+      owner:
+        userID: '6231341521'
+        name: pon
+        surname: tang
+        status: student3
+        major: com
+        picpath: /static/profiles/16221472470696231341521.png
+      chats:
+      - messageID: message01
+        senderID: '6231341521'
+        message: ยังเลยว่ะ ส่งวันไหนวะ
+        messageType: TEXT
+        sendtime: 2021-05-05T08:32:48Z
+      - messageID: message02
+        senderID: '6030024721'
+        message: ทำม็อคอังกฤษยังวะ
+        messageType: TEXT
+        sendtime: 2021-05-05T08:32:48Z
+      - messageID: 8cf0c7df-396d-4f92-b6a5-956514b49128
+        senderID: '6231341521'
+        message: Asdasdas
+        messageType: TEXT
+        sendtime: 2021-05-15T14:42:15Z
+    type: object
+    properties:
+      roomID:
+        type: string
+      name:
+        type: string
+      picpath:
+        type: string
+      members:
+        type: array
+        items:
+          $ref: '#/definitions/Member1'
+      owner:
+        $ref: '#/definitions/Owner'
+      chats:
+        type: array
+        items:
+          $ref: '#/definitions/Chat'
+    required:
+    - roomID
+    - name
+    - picpath
+    - members
+    - owner
+    - chats
+  Member1:
+    title: Member1
+    example:
+      userID: '6231341521'
+      name: pon
+      surname: tang
+      status: student3
+      major: com
+      picpath: /static/profiles/16221472470696231341521.png
+    type: object
+    properties:
+      userID:
+        type: string
+      name:
+        type: string
+      surname:
+        type: string
+      status:
+        type: string
+      major:
+        type: string
+      picpath:
+        type: string
+    required:
+    - userID
+    - name
+    - surname
+    - status
+    - major
+    - picpath
+  Chat:
+    title: Chat
+    example:
+      messageID: message01
+      senderID: '6231341521'
+      message: ยังเลยว่ะ ส่งวันไหนวะ
+      messageType: TEXT
+      sendtime: 2021-05-05T08:32:48Z
+    type: object
+    properties:
+      messageID:
+        type: string
+      senderID:
+        type: string
+      message:
+        type: string
+      messageType:
+        type: string
+      sendtime:
+        type: string
+    required:
+    - messageID
+    - senderID
+    - message
+    - messageType
+    - sendtime
+  UpdateGroupPicture:
+    title: UpdateGroupPicture
+    example:
+      msg: Profile picture updated successfully
+    type: object
+    properties:
+      msg:
+        type: string
+    required:
+    - msg
+  InviteOtherstoRoomRequest:
+    title: InviteOtherstoRoomRequest
+    example:
+      targetIDs:
+      - '12345'
+      - '6030024721'
+    type: object
+    properties:
+      targetIDs:
+        type: array
+        items:
+          type: string
+    required:
+    - targetIDs
+  InviteOtherstoRoom:
+    title: InviteOtherstoRoom
+    example:
+      msg: Chatroom Invited
+    type: object
+    properties:
+      msg:
+        type: string
+    required:
+    - msg
+tags:
+- name: Authentication
+- name: Contact & Profile
+- name: Feed Wall
+- name: Chat Room
+- name: File Server
