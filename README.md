@@ -6,6 +6,11 @@ This is a NodeJS program, using as a backend for CUIE App Backend.
 
 The project runs on docker-compose, so only [Docker](https://docs.docker.com/engine/install/) is required.
 
+Tested with
+
+* Docker version 20.10.6
+* docker-compose version 1.29.1
+
 ## Initialization
 
 1. Either download this project, or pull this into your local git repository.
@@ -13,7 +18,11 @@ The project runs on docker-compose, so only [Docker](https://docs.docker.com/eng
 2. Rename or copy `.env.template` into `.env`. You can change the values freely. The descriptions of each keys are as followed. Note that the actual values on the actual server are different.
 
     ```text
-    ...
+    DB_ROOT_PASSWORD=<Password for root@% user>
+    DB_DATABASE=<Initial Database>
+    DB_USERNAME=<User for NodeJS to access database>
+    DB_PASSWORD=<Password for DB_USERNAME>
+    PATH_STATIC=<Path to File&Pic Folder>
     ```
 
 3. Run docker-compose, notice that folder `volumes/` is automatically created.
