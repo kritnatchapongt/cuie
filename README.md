@@ -109,10 +109,73 @@ Note that all socket APIs are written in the perspective of the client side.
 
 Only important (and not SocketIO default) endpoints are documented here, others are commented in the `nodejs/sockets/map.js` in the first section.
 
-Emit: `signin`
+> Emit: `signin`
 
-The first endpoint to be emitted right after each successful connection to the server.
-The endpoint allows server to handle client's `socketID` appropriately, by assigning `socketID` to all of the user's chatrooms.
+```javascript
+{
+    userID: string
+    password: string
+}
+```
+
+* The first endpoint to be emitted right after each successful connection to the server.
+* The endpoint allows server to handle client's `socketID` appropriately, by assigning `socketID` to all of the user's chatrooms.
+* After emitting successfully, the server will respond with `signin:response`
+
+> On: `signin:response`
+
+```javascript
+{
+    success: bool
+    status: int
+    message: string
+    param: any
+}
+```
+
+* Response from server, from `signin`
+
+> Emit: `chat:send`
+
+```javascript
+{
+    roomID: string
+    message: string
+    messageType: string ('TEXT')
+}
+```
+
+* Send chat to any roomID that user is in.
+* Need signing in with `signin` first.
+* After emitting successfully, the server will respond with `chat:send:response`
+
+> On: `chat:send:response`
+
+```javascript
+{
+    roomID: string
+    message: string
+    messageType: string ('TEXT')
+}
+```
+
+* Response from server, from `chat:send`
+
+> Emit: `chat:receive`
+
+```javascript
+{
+    messageID: string
+    roomID: string
+    senderID: string
+    message: string
+    messageType: string ('TEXT')
+    sendtime: string (timestamp)
+}
+```
+
+* Receive message from any room the user is in.
+* Need signing in with `signin` first.
 
 ## Source Code Files Description
 
